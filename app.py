@@ -5,11 +5,12 @@ import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
+# On force Flask à utiliser le dossier /tmp pour ses données d'instance (évite l'erreur Read-only)
+app = Flask(__name__, instance_path="/tmp/flask_instance")
 app.secret_key = os.environ.get("SECRET_KEY", "prime_business_2026_key")
 
 # --- 1. CONFIGURATION DE LA BASE ---
-uri = os.environ.get("DATABASE_URL", "sqlite:///prime_business.db")
+uri = os.environ.get("DATABASE_URL", "sqlite:////tmp/prime_business.db")
 
 # Sécurité supplémentaire : si l'URL commence par postgres:// (sans le ql), on corrige
 if uri and uri.startswith("postgres://"):
@@ -18,7 +19,6 @@ if uri and uri.startswith("postgres://"):
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
 # --- 2. MODÈLES ---
 class Produit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
