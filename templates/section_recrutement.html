@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recrutement - Réseau MEDJOGBE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght=300;400;700;900&display=swap');
+        
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; }
+        
+        .card-white {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        input, select {
+            background: #f1f5f9 !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #020617 !important;
+            background: #ffffff !important;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(2, 6, 23, 0.05);
+        }
+
+        @keyframes progress { from { width: 0%; } to { width: 100%; } }
+        .animate-progress-5s { animation: progress 5s linear forwards; }
+
+        #thanksSection { animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 text-slate-900">
+
+    <div class="max-w-xl w-full">
+        
+        <div class="mb-4">
+            <a href="/accueil" class="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-all">← Retour à l'accueil</a>
+        </div>
+
+        <div class="flex justify-center mb-8">
+            <svg width="60" height="40" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="25" cy="25" r="18" stroke="#020617" stroke-width="3"/>
+                <circle cx="55" cy="25" r="18" stroke="#020617" stroke-width="3"/>
+            </svg>
+        </div>
+
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight uppercase">Rejoignez l'Équipe</h1>
+            <p class="text-slate-500 text-sm mt-2">Construisons ensemble l'avenir du Réseau MEDJOGBE.</p>
+        </div>
+
+        <div id="mainContainer" class="card-white w-full p-8 md:p-10 rounded-[2rem]">
+            
+            <div id="formSection">
+                <form class="space-y-6">
+                    
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nom et Prénom</label>
+                        <input type="text" id="nom_r" placeholder="Ex: Jean Dupont" class="w-full py-4 px-4 text-slate-900">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Année de naissance</label>
+                        <input type="number" id="annee_r" placeholder="Ex: 1998" class="w-full py-4 px-4 text-slate-900">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nationalité</label>
+                        <input type="text" id="nat_r" placeholder="Ex: Béninoise" class="w-full py-4 px-4 text-slate-900">
+                    </div>
+                    
+                    <div class="space-y-1 relative">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Poste souhaité</label>
+                        <select id="poste_r" class="w-full py-4 px-4 text-slate-900 appearance-none cursor-pointer">
+                            <option value="">-- Sélectionner un poste --</option>
+                            {% for p in postes %}
+                            <option value="{{ p.titre }}">{{ p.titre }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="absolute right-4 top-10 text-slate-400 pointer-events-none text-xs">▼</span>
+                    </div>
+
+                    <div class="flex items-start gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 italic text-slate-500">
+                        <span class="text-lg">ℹ️</span>
+                        <p class="text-[11px] leading-tight uppercase tracking-wider font-medium">
+                            Votre dossier sera transmis instantanément <br>à notre équipe de recrutement.
+                        </p>
+                    </div>
+
+                    <div class="text-center bg-slate-900 py-3 rounded-xl shadow-inner border-b-2 border-blue-500">
+                        <p class="text-[9px] text-white/40 font-bold tracking-[0.3em] uppercase mb-1">Garantie Éthique</p>
+                        <p class="text-xl font-black text-white italic tracking-tighter">SERVICE <span class="text-blue-400 underline decoration-2">100% GRATUIT</span></p>
+                    </div>
+
+                    <button type="button" onclick="executeSend()" 
+                            class="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-xl shadow-lg transition-all transform active:scale-95 uppercase tracking-[0.2em] text-xs">
+                        Valider ma candidature
+                    </button>
+                </form>
+            </div>
+
+            <div id="thanksSection" class="hidden text-center py-10 space-y-6">
+                <div id="successCheck" class="w-20 h-20 bg-slate-900 text-white rounded-full flex items-center justify-center text-3xl mx-auto shadow-2xl">✓</div>
+                <h2 id="thanksTitle" class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Transmission en cours</h2>
+                
+                <p id="statusText" class="text-slate-500 text-sm h-12 flex items-center justify-center px-4 font-medium italic">
+                    Préparation de votre dossier...
+                </p>
+
+                <div id="progressBarContainer" class="w-48 mx-auto bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner border border-slate-200">
+                    <div class="bg-gradient-to-r from-slate-600 to-slate-900 h-full animate-progress-5s"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <p class="text-center text-slate-400 text-[9px] mt-10 uppercase tracking-[0.5em] font-black italic">Réseau MEDJOGBE • Excellence & Intégrité</p>
+    </div>
+
+    <script>
+    function executeSend() {
+        // 1. Collecte des données du formulaire
+        const d = {
+            nom: document.getElementById('nom_r').value.trim(),
+            annee: document.getElementById('annee_r').value.trim(),
+            nat: document.getElementById('nat_r').value.trim(),
+            poste: document.getElementById('poste_r').value.trim()
+        };
+
+        // 2. Validation de sécurité
+        if(!d.nom || !d.annee || !d.nat || !d.poste) {
+            return alert("❌ Veuillez remplir tous les champs.");
+        }
+
+        // 3. Animation de l'interface
+        const statusLabel = document.getElementById('statusText');
+        document.getElementById('formSection').classList.add('hidden');
+        document.getElementById('thanksSection').classList.remove('hidden');
+
+        setTimeout(() => { 
+            statusLabel.innerHTML = `Traitement sécurisé du dossier de <span class="text-slate-900 font-black">${d.nom.split(' ')[0]}</span>...`; 
+        }, 1200);
+
+        // 4. APPEL À L'API FLASK (Plus aucun lien WhatsApp ici)
+        fetch('/soumettre-candidature', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(d)
+        })
+        .then(response => {
+            if (response.ok) {
+                // Succès : Notification envoyée au Bot Telegram
+                setTimeout(() => {
+                    document.getElementById('successCheck').classList.add('animate-bounce');
+                    document.getElementById('thanksTitle').innerText = "Candidature Reçue !";
+                    statusLabel.innerHTML = "✨ Votre candidature a été transmise avec succès au service RH. Nous reviendrons vers vous.";
+                    document.getElementById('progressBarContainer').classList.add('hidden');
+                }, 2500);
+            } else {
+                throw new Error("Erreur serveur");
+            }
+        })
+        .catch(error => {
+            // En cas de problème de connexion
+            document.getElementById('successCheck').innerHTML = "❌";
+            document.getElementById('thanksTitle').innerText = "Échec de l'envoi";
+            statusLabel.innerHTML = "⚠️ Une erreur technique est survenue. Veuillez rafraîchir la page et réessayer.";
+            document.getElementById('progressBarContainer').classList.add('hidden');
+        });
+    }
+    </script>
+
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6a329cbc66a0b51d461c65e5/1jrd2qrva';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+</body>
+</html>

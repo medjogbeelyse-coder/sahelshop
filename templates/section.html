@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PRIME BUSINESS - Boutique</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; display: flex; justify-content: center; overflow-x: hidden; }
+
+        /* --- ÉCRAN DE BIENVENUE OPTIMISÉ (1.2 SECONDE) --- */
+        #welcome-screen {
+            position: fixed; inset: 0; background: #ffffff; z-index: 2000;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .welcome-text {
+            font-size: 15px; font-weight: 900; text-transform: uppercase;
+            letter-spacing: 4px; color: #0f172a; opacity: 0; transform: translateY(10px);
+            animation: welcomeFade 1.2s forwards;
+        }
+        @keyframes welcomeFade {
+            25% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* --- BOUTIQUE --- */
+        .mobile-container { 
+            width: 100%; max-width: 500px; background: #f8fafc; min-height: 100vh; 
+            position: relative; opacity: 0; transition: opacity 0.6s ease-in;
+        }
+        .show-shop { opacity: 1 !important; }
+
+        .card-item { 
+            background: #ffffff; border-radius: 14px; border: 1px solid #f1f5f9; padding: 8px; 
+            display: flex; flex-direction: column; justify-content: space-between;
+            opacity: 0; transform: scale(0.95); transition: box-shadow 0.2s ease;
+        }
+        .card-item:hover { box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04); }
+        .animate-card { animation: fadeInCard 0.4s ease-out forwards; }
+        @keyframes fadeInCard { to { opacity: 1; transform: scale(1); } }
+
+        /* --- NOUVELLE BARRE FIXE EN BAS --- */
+        .bottom-action-bar {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 500px; background: #ffffff;
+            box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.06);
+            border-top: 1px solid #f1f5f9; padding: 12px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 999;
+        }
+        /* Ajustement de Tawk.to : On laisse la place à droite pour la bulle */
+        .cart-trigger-btn {
+            background: #0f172a; color: white; padding: 12px 20px;
+            border-radius: 14px; font-weight: 700; font-size: 13px;
+            display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+            transition: all 0.2s; width: 65%; justify-content: center;
+        }
+        .cart-trigger-btn:active { transform: scale(0.97); }
+
+        .cart-open { transform: translateY(0) !important; }
+        @keyframes progress { from { width: 0%; } to { width: 100%; } }
+        .animate-progress-2s { animation: progress 2s linear forwards; }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-screen">
+        <h2 class="welcome-text">Ouverture des rayons</h2>
+        <div class="mt-3 flex gap-1.5">
+            <span class="w-2 h-2 bg-slate-900 rounded-full animate-bounce"></span>
+            <span class="w-2 h-2 bg-slate-900 rounded-full animate-bounce [animation-delay:0.15s]"></span>
+            <span class="w-2 h-2 bg-slate-900 rounded-full animate-bounce [animation-delay:0.3s]"></span>
+        </div>
+    </div>
+
+    <!-- Padding de 32 (pb-32) en bas pour ne pas cacher les derniers produits derrière la barre fixe -->
+    <div id="shop-container" class="mobile-container p-4 pb-32">
+        
+        <header class="relative flex flex-col items-center justify-center py-4 mb-4">
+            <a href="{{ url_for('presentation') }}" class="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs font-bold text-slate-400 bg-white px-3 py-1.5 rounded-xl border border-slate-100 active:scale-95 transition-all">
+                👋 Quitter
+            </a>
+            <h1 class="text-xl font-black text-slate-900 tracking-tighter uppercase">PRIME BUSINESS</h1>
+            <p class="text-[9px] text-slate-400 font-bold tracking-[0.2em] uppercase mt-0.5">L'Excellence au quotidien</p>
+        </header>
+
+        <div class="mb-8">
+            <h2 class="text-xs font-black text-slate-800 mb-3.5 flex items-center gap-2 tracking-wider">
+                <span class="bg-amber-500 w-1.5 h-4 rounded-full"></span> GEM & MATÉRIEL
+            </h2>
+            <div class="grid grid-cols-2 gap-3">
+                {% for p in produits if p.section == 'commerce_gem' %}
+                <div class="card-item shadow-sm">
+                    <img src="{{ p.image }}" class="w-full h-28 object-cover rounded-xl mb-2 bg-slate-50">
+                    <h3 class="text-[10px] font-bold text-slate-700 min-h-6 max-h-6 overflow-hidden uppercase leading-tight mb-1">{{ p.designation }}</h3>
+                    <p class="text-amber-600 font-black text-xs mb-2">{{ "{:,.0f}".format(p.prix) }} F</p>
+                    <button onclick="addToCart('{{ p.designation }}', {{ p.prix }}, 'GEM')" class="w-full bg-slate-900 text-white py-2 rounded-xl text-[10px] font-bold uppercase active:scale-95 transition-transform">Ajouter 🛒</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-xs font-black text-emerald-600 mb-3.5 flex items-center gap-2 tracking-wider">
+                <span class="bg-emerald-500 w-1.5 h-4 rounded-full"></span> LE MARCHÉ
+            </h2>
+            <div class="grid grid-cols-2 gap-3">
+                {% for p in produits if p.section == 'commerce_marche' %}
+                <div class="card-item shadow-sm">
+                    <img src="{{ p.image }}" class="w-full h-28 object-cover rounded-xl mb-2 bg-slate-50">
+                    <h3 class="text-[10px] font-bold text-slate-700 min-h-6 max-h-6 overflow-hidden uppercase leading-tight mb-1">{{ p.designation }}</h3>
+                    <p class="text-emerald-600 font-black text-xs mb-2">{{ "{:,.0f}".format(p.prix) }} F</p>
+                    <button onclick="addToCart('{{ p.designation }}', {{ p.prix }}, 'MARCHE')" class="w-full bg-emerald-600 text-white py-2 rounded-xl text-[10px] font-bold uppercase active:scale-95 transition-transform">Ajouter 🛒</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- NOUVELLE BARRE COMMANDE ET PANIER FIXE (SANS CHEVAUCHEMENT TAWK.TO) -->
+        <div class="bottom-action-bar">
+            <div class="flex flex-col">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Panier total</span>
+                <span id="barTotal" class="text-base font-black text-slate-900">0 F</span>
+            </div>
+            <button onclick="toggleCart()" class="cart-trigger-btn">
+                <span>Voir mon panier</span>
+                <span id="barCount" class="bg-amber-500 text-slate-900 px-2 py-0.5 rounded-md font-black text-xs">0</span>
+            </button>
+            <!-- L'espace vide restant à droite laisse Tawk.to s'afficher sans toucher votre bouton -->
+            <div class="w-12 h-6"></div> 
+        </div>
+
+        <!-- Panier -->
+        <div id="cartSidebar" class="fixed inset-0 bg-slate-900/60 z-[1000] hidden flex flex-col justify-end">
+            <div id="sidebarContent" class="bg-white w-full rounded-t-[2.5rem] max-w-[500px] mx-auto translate-y-full transition-transform duration-300 flex flex-col max-h-[85vh]">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="text-base font-black text-slate-800 uppercase tracking-tight">Mon Panier</h2>
+                    <button onclick="toggleCart()" class="text-[10px] font-black bg-slate-100 px-3 py-1.5 rounded-xl text-slate-400 uppercase tracking-widest">Fermer</button>
+                </div>
+                <div id="cartItems" class="flex-grow overflow-y-auto p-5 space-y-2.5"></div>
+                <div class="p-6 border-t border-slate-100 bg-slate-50">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-black text-[10px] text-slate-400 tracking-wider">TOTAL ESTIMÉ</span>
+                        <span id="cartTotal" class="text-xl font-black text-slate-900">0 F</span>
+                    </div>
+                    <button id="checkoutBtn" onclick="openOrderModal()" disabled class="w-full bg-slate-300 text-white font-black py-4 rounded-2xl uppercase text-xs tracking-wider transition-all">Passer la commande</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fenêtre de Commande -->
+        <div id="orderModal" class="hidden fixed inset-0 bg-slate-900/80 z-[2000] flex items-center justify-center p-4 text-center">
+            <div class="bg-white w-full max-w-[380px] rounded-[2.5rem] p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+                
+                <div id="modalForm">
+                    <div class="w-12 h-12 bg-slate-100 text-xl flex items-center justify-center rounded-full mx-auto mb-3">📝</div>
+                    <h2 class="text-base font-black mb-1 uppercase tracking-tight text-slate-900">Livraison de ma commande</h2>
+                    <p class="text-[11px] text-slate-400 font-semibold mb-4">Remplissez vos informations pour l'expédition</p>
+                    
+                    <input type="text" id="clientName" placeholder="Votre nom complet *" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl mb-2 text-center font-bold outline-none text-xs focus:border-slate-900 focus:bg-white transition-all">
+                    <input type="email" id="clientEmail" placeholder="Votre adresse e-mail (Facultatif)" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl mb-2 text-center font-bold outline-none text-xs focus:border-slate-900 focus:bg-white transition-all">
+                    <input type="text" id="clientCountry" placeholder="Pays de livraison *" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl mb-2 text-center font-bold outline-none text-xs focus:border-slate-900 focus:bg-white transition-all">
+                    <input type="text" id="clientCity" placeholder="Ville de livraison *" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl mb-2 text-center font-bold outline-none text-xs focus:border-slate-900 focus:bg-white transition-all">
+                    <input type="tel" id="clientPhone" placeholder="Numéro de téléphone principal *" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl mb-2 text-center font-bold outline-none text-xs focus:border-slate-900 focus:bg-white transition-all">
+                    <input type="tel" id="clientPhone2" placeholder="Second numéro (Facultatif)" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl mb-4 text-center font-bold outline-none text-xs focus:border-slate-900 focus:bg-white transition-all">
+                    
+                    <button onclick="startOrderProcess()" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl uppercase text-xs tracking-wider shadow-md active:scale-95 transition-transform">Valider ma commande</button>
+                    <button onclick="closeModal()" class="mt-3 text-[9px] text-slate-400 font-bold uppercase tracking-widest block mx-auto">Retourner au panier</button>
+                </div>
+
+                <div id="modalWait" class="hidden py-6">
+                    <div class="text-4xl mb-3 animate-pulse">🚀</div>
+                    <h2 class="text-xs font-black uppercase tracking-wider text-slate-800">Transmission de la commande...</h2>
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-5">
+                        <div id="progressBar" class="bg-emerald-500 h-full w-0"></div>
+                    </div>
+                </div>
+
+                <div id="modalQuestion" class="hidden py-4">
+                    <div class="text-4xl mb-3">🎉</div>
+                    <h2 class="text-base font-black mb-1 uppercase tracking-tight text-slate-900">Commande enregistrée !</h2>
+                    <p class="text-[11px] text-slate-500 font-medium mb-6 px-4">Avez-vous quelque chose à demander à notre service client concernant votre commande ?</p>
+                    
+                    <div class="flex flex-col gap-2">
+                        <button onclick="handleQuestionChoice(true)" class="w-full bg-emerald-600 text-white font-black py-3 rounded-xl uppercase text-xs tracking-wider shadow-md active:scale-95 transition-transform">
+                            🟢 OUI, j'ai une question
+                        </button>
+                        <button onclick="handleQuestionChoice(false)" class="w-full bg-slate-100 text-slate-700 font-black py-3 rounded-xl uppercase text-xs tracking-wider active:scale-95 transition-transform">
+                            ⚪ NON, je continue mes achats
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = () => {
+            setTimeout(() => {
+                const welcome = document.getElementById('welcome-screen');
+                welcome.style.opacity = '0';
+                
+                const shop = document.getElementById('shop-container');
+                shop.classList.add('show-shop');
+
+                document.querySelectorAll('.card-item').forEach((card, i) => {
+                    setTimeout(() => card.classList.add('animate-card'), i * 40);
+                });
+
+                setTimeout(() => welcome.remove(), 400);
+            }, 1200);
+        };
+
+        let cart = JSON.parse(localStorage.getItem('pb_cart')) || [];
+
+        function updateUI() {
+            localStorage.setItem('pb_cart', JSON.stringify(cart));
+            const countBar = document.getElementById('barCount');
+            const container = document.getElementById('cartItems'), totalEl = document.getElementById('cartTotal'), btn = document.getElementById('checkoutBtn');
+            const barTotal = document.getElementById('barTotal');
+            
+            const totalQty = cart.reduce((acc, item) => acc + item.quantity, 0);
+            countBar.innerText = totalQty;
+            
+            const calculatedTotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            barTotal.innerText = `${calculatedTotal.toLocaleString()} F`;
+            totalEl.innerText = `${calculatedTotal.toLocaleString()} F`;
+
+            if(cart.length === 0) {
+                container.innerHTML = '<div class="py-12 opacity-30 italic text-xs text-center">Votre panier est vide pour le moment</div>';
+                btn.disabled = true; btn.className = "w-full bg-slate-200 text-slate-400 font-black py-4 rounded-2xl uppercase text-xs tracking-wider cursor-not-allowed";
+            } else {
+                btn.disabled = false; btn.className = "w-full bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs tracking-wider shadow-lg active:scale-[0.98] transition-transform";
+                
+                container.innerHTML = cart.map((item, index) => `
+                    <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <div class="flex-grow pr-2">
+                            <h4 class="text-[10px] font-bold uppercase text-slate-800 truncate w-40">${item.name}</h4>
+                            <p class="text-slate-500 font-black text-[11px] mt-0.5">${(item.price * item.quantity).toLocaleString()} F</p>
+                        </div>
+                        <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
+                            <button onclick="changeQty(${index}, -1)" class="w-6 h-6 flex items-center justify-center font-bold text-xs text-slate-500 hover:bg-slate-50 rounded">-</button>
+                            <span class="text-[11px] font-black text-slate-800 px-1">${item.quantity}</span>
+                            <button onclick="changeQty(${index}, 1)" class="w-6 h-6 flex items-center justify-center font-bold text-xs text-slate-500 hover:bg-slate-50 rounded">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function addToCart(name, price, type) {
+            const existing = cart.find(item => item.name === name);
+            if(existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ name, price, type, quantity: 1 });
+            }
+            updateUI();
+        }
+
+        function changeQty(index, change) {
+            cart[index].quantity += change;
+            if(cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateUI();
+        }
+
+        function toggleCart() {
+            const s = document.getElementById('cartSidebar'), c = document.getElementById('sidebarContent');
+            if(s.classList.contains('hidden')) { 
+                s.classList.remove('hidden'); 
+                setTimeout(() => c.classList.add('cart-open'), 10); 
+            }
+            else { 
+                c.classList.remove('cart-open'); 
+                setTimeout(() => s.classList.add('hidden'), 300); 
+            }
+        }
+        
+        function openOrderModal() { 
+            document.getElementById('modalForm').classList.remove('hidden'); 
+            document.getElementById('modalWait').classList.add('hidden'); 
+            document.getElementById('modalQuestion').classList.add('hidden'); 
+            document.getElementById('orderModal').classList.remove('hidden'); 
+        }
+        
+        function closeModal() { 
+            document.getElementById('orderModal').classList.add('hidden'); 
+        }
+
+        function startOrderProcess() {
+            const name = document.getElementById('clientName').value.trim();
+            const email = document.getElementById('clientEmail').value.trim();
+            const country = document.getElementById('clientCountry').value.trim();
+            const city = document.getElementById('clientCity').value.trim();
+            const phone = document.getElementById('clientPhone').value.trim();
+            const phone2 = document.getElementById('clientPhone2').value.trim();
+            
+            if (!name || !country || !city || !phone) {
+                return alert("Veuillez remplir tous les champs obligatoires marqués d'une étoile (*).");
+            }
+            
+            document.getElementById('modalForm').classList.add('hidden');
+            document.getElementById('modalWait').classList.remove('hidden');
+            const bar = document.getElementById('progressBar');
+            bar.classList.add('animate-progress-2s');
+            
+            const totalArticles = cart.reduce((acc, item) => acc + item.quantity, 0);
+            
+            fetch('/passer-commande', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nom: name,
+                    email: email ? email : "Non renseigné",
+                    pays: country,
+                    ville: city,
+                    telephone: phone,
+                    telephone2: phone2 ? phone2 : "Non renseigné",
+                    total_marchandise: totalArticles,
+                    panier: cart
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                bar.classList.remove('animate-progress-2s');
+                if(data.success) {
+                    document.getElementById('modalWait').classList.add('hidden');
+                    document.getElementById('modalQuestion').classList.remove('hidden');
+                    cart = []; 
+                    updateUI();
+                } else {
+                    alert("Erreur : " + data.message);
+                    document.getElementById('modalForm').classList.remove('hidden');
+                    document.getElementById('modalWait').classList.add('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert("Erreur réseau lors de l'envoi.");
+                document.getElementById('modalForm').classList.remove('hidden');
+                document.getElementById('modalWait').classList.add('hidden');
+                bar.classList.remove('animate-progress-2s');
+            });
+        }
+
+        function handleQuestionChoice(hasQuestion) {
+            document.getElementById('orderModal').classList.add('hidden');
+            document.getElementById('modalQuestion').classList.add('hidden');
+            
+            const s = document.getElementById('cartSidebar'), c = document.getElementById('sidebarContent');
+            c.classList.remove('cart-open'); 
+            s.classList.add('hidden');
+            
+            if (hasQuestion) {
+                if (typeof Tawk_API !== 'undefined' && Tawk_API.maximize) {
+                    Tawk_API.maximize();
+                } else {
+                    alert("Le chat charge encore. Cliquez sur l'icône en bas pour parler avec un conseiller.");
+                }
+            }
+        }
+        updateUI();
+    </script>
+
+    <!-- Script Tawk.to -->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6a329cbc66a0b51d461c65e5/default';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investissement | Prime Business</title>
+    <style>
+        /* CSS Business Pro & Épuré */
+        :root {
+            --primary-color: #0f172a;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: var(--text-light);
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--primary-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--text-color);
+            background-color: #fff;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 233, 0.15);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* --- OVERLAY PLANQUÉ AU MILIEU DE L'ÉCRAN --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(15, 23, 42, 0.6); /* Assombrit l'arrière-plan */
+            backdrop-filter: blur(4px); /* Effet flou pro arrière-plan */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Quand la modal est active */
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* La boîte de message au centre */
+        .status-msg {
+            max-width: 420px;
+            width: 90%;
+            padding: 24px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.6;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .status-msg {
+            transform: scale(1);
+        }
+
+        /* Couleurs très flashy et contrastées pour le centre */
+        .status-success {
+            background-color: #bbf7d0; /* Vert bien vif */
+            color: #14532d;            /* Texte ultra foncé */
+            border: 3px solid #22c55e;
+        }
+
+        .status-error {
+            background-color: #fecaca; /* Rouge bien vif */
+            color: #7f1d1d;
+            border: 3px solid #ef4444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Formulaire Investisseur</h2>
+    <p class="subtitle">Remplissez les informations ci-dessous pour soumettre votre projet.</p>
+
+    <div class="form-group">
+        <label for="nom">Nom complet</label>
+        <input id="nom" placeholder="Ex: Jean Dupont">
+    </div>
+
+    <div class="form-group">
+        <label for="pays">Pays</label>
+        <input id="pays" placeholder="Ex: Côte d'Ivoire">
+    </div>
+
+    <div class="form-group">
+        <label for="ville">Ville</label>
+        <input id="ville" placeholder="Ex: Abidjan">
+    </div>
+
+    <div class="form-group">
+        <label for="tel">Téléphone (avec indicatif)</label>
+        <input id="tel" placeholder="Ex: +225 0700000000">
+    </div>
+
+    <div class="form-group">
+        <label for="montant">Montant de l'investissement (FCFA)</label>
+        <input id="montant" type="number" placeholder="Ex: 5000000">
+    </div>
+
+    <button onclick="send()">Soumettre ma demande</button>
+</div>
+
+<div id="modalOverlay" class="modal-overlay">
+    <div id="feedback" class="status-msg"></div>
+</div>
+
+<script>
+function send() {
+    const overlay = document.getElementById("modalOverlay");
+    const feedbackDiv = document.getElementById("feedback");
+    
+    // Reset initial
+    overlay.classList.remove("active");
+    feedbackDiv.className = "status-msg";
+    feedbackDiv.innerText = "";
+
+    const nom = document.getElementById("nom").value;
+    const pays = document.getElementById("pays").value;
+    const ville = document.getElementById("ville").value;
+    const tel = document.getElementById("tel").value;
+    const montant = document.getElementById("montant").value;
+
+    if(!nom || !tel || !montant) {
+        feedbackDiv.innerText = "⚠️ Veuillez remplir au moins le Nom, le Téléphone et le Montant.";
+        feedbackDiv.classList.add("status-error");
+        overlay.classList.add("active");
+        
+        setTimeout(() => {
+            overlay.classList.remove("active");
+        }, 5000);
+        return;
+    }
+
+    fetch("/api/investissement", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            nom: nom,
+            pays: pays,
+            ville: ville,
+            tel: tel,
+            montant: montant
+        })
+    })
+    .then(res => {
+        if (res.ok) {
+            return res.json();
+        } else {
+            throw new Error();
+        }
+    })
+    .then(data => {
+        // Ajout du texte demandé
+        feedbackDiv.innerText = "Votre formulaire d'investissement est bien envoyé. Vous serez contacté par WhatsApp dans 24h.";
+        feedbackDiv.classList.add("status-success");
+        
+        // Déclenche l'apparition au milieu de l'écran
+        overlay.classList.add("active");
+
+        // Nettoyage complet du formulaire
+        document.getElementById("nom").value = "";
+        document.getElementById("pays").value = "";
+        document.getElementById("ville").value = "";
+        document.getElementById("tel").value = "";
+        document.getElementById("montant").value = "";
+
+        // Disparition de l'écran après 5 secondes pile
+        setTimeout(() => {
+            overlay.classList.remove("active");
+        }, 5000);
+    })
+    .catch(err => {
+        feedbackDiv.innerText = "⚠️ Une erreur est survenue lors de l'envoi. Veuillez réessayer.";
+        feedbackDiv.classList.add("status-error");
+        overlay.classList.add("active");
+
+        setTimeout(() => {
+            overlay.classList.remove("active");
+        }, 5000);
+    });
+}
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6a329cbc66a0b51d461c65e5/1jrd2qrva';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+
+</body>
+</html>

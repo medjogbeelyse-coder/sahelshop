@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+        .card { background: #1e293b; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        input, select { background: #334155; border: 1px solid #475569; color: white; padding: 10px; border-radius: 8px; outline: none; transition: 0.2s; }
+        input:focus, select:focus { border-color: #22d3ee; }
+    </style>
+</head>
+<body class="p-6">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-cyan-400">Gestionnaire Admin</h1>
+        <a href="{{ url_for('admin_logout') }}" class="bg-red-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-500 transition">Déconnexion</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-center">
+        {% for key, val in flags.items() %}
+        <form method="POST">
+            <input type="hidden" name="flag_key" value="{{ key }}">
+            <button class="w-full py-3 rounded-xl font-bold transition {{ 'bg-green-600 hover:bg-green-500' if val else 'bg-red-600 hover:bg-red-500' }}">
+                {{ key|upper }} : {{ 'ACTIF' if val else 'BLOQUÉ' }}
+            </button>
+        </form>
+        {% endfor %}
+    </div>
+
+    <div class="card mb-8">
+        <h2 class="text-xl mb-4 font-bold text-cyan-300">Nouveau Produit / Service</h2>
+        <form method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <input type="text" name="designation" placeholder="Désignation" required>
+            <input type="number" name="price" placeholder="Prix (FCFA)" required>
+            <select name="category">
+                <optgroup label="Commerce">
+                    <option value="commerce_gem">GEM & MATÉRIEL</option>
+                    <option value="commerce_marche">LE MARCHÉ</option>
+                </optgroup>
+                <option value="investissement">INVESTISSEMENT (Autre)</option>
+            </select>
+            <input type="file" name="image_file" accept="image/*" class="text-xs">
+            <button class="bg-cyan-600 rounded-lg font-bold hover:bg-cyan-500 transition">Enregistrer</button>
+        </form>
+    </div>
+
+    <div class="card mb-8 border-l-4 border-purple-500">
+        <h2 class="text-xl mb-4 font-bold text-purple-400">Publier un Poste</h2>
+        <form method="POST" class="flex gap-4 mb-4">
+            <input type="text" name="titre_poste" placeholder="Titre du poste (ex: Secrétaire)" required class="flex-1">
+            <button class="bg-purple-600 px-6 py-2 rounded-lg font-bold hover:bg-purple-500 transition">Publier</button>
+        </form>
+        <div class="space-y-2">
+            {% for poste in postes %}
+            <div class="flex justify-between bg-slate-800 p-2 rounded border border-slate-700">
+                <span>{{ poste.titre }}</span>
+                <form method="POST" onsubmit="return confirm('Supprimer ce poste ?');">
+                    <input type="hidden" name="delete_poste_id" value="{{ poste.id }}">
+                    <button class="text-red-400 text-xs font-bold uppercase hover:text-red-300">Supprimer</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card overflow-x-auto">
+        <h2 class="text-xl mb-4 font-bold text-gray-400">Articles en ligne</h2>
+        <table class="w-full text-left">
+            <tr class="border-b border-slate-700 text-cyan-400 text-sm">
+                <th class="p-3">Désignation</th>
+                <th class="p-3">Emplacement</th>
+                <th class="p-3">Prix</th>
+                <th class="p-3">Action</th>
+            </tr>
+            {% for p in produits %}
+            <tr class="border-b border-slate-800 text-sm hover:bg-slate-800/50">
+                <td class="p-3 font-medium">{{ p.designation }}</td>
+                <td class="p-3">
+                    <span class="px-2 py-1 rounded text-[10px] font-bold {{ 'bg-amber-900 text-amber-200' if p.section == 'commerce_gem' else 'bg-green-900 text-green-200' }}">
+                        {{ p.section|upper }}
+                    </span>
+                </td>
+                <td class="p-3">{{ "{:,.0f}".format(p.prix) }} F</td>
+                <td class="p-3">
+                    <form method="POST" onsubmit="return confirm('Supprimer cet article ?');">
+                        <input type="hidden" name="delete_id" value="{{ p.id }}">
+                        <button class="text-red-500 font-bold hover:text-red-400">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

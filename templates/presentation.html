@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prime Business - Gold Signature</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette chaleureuse alignée sur ton univers e-commerce */
+            --primary-color: #E67E22;
+            --primary-hover: #D35400;
+            --text-main: #2C3E50;
+            --text-muted: #5D6D7E;
+            --bg-warm: #FFFDF9; /* Fond crème léger très accueillant */
+            --accent-bg: #FDF2E9;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-warm);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 60px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        /* Badge Premium */
+        .premium-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #FFFFFF;
+            border: 1px solid rgba(230, 126, 34, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.05);
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary-color);
+            animation: pulse 2s infinite;
+        }
+
+        /* Titre et Sous-titre */
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--text-main);
+            letter-spacing: -1px;
+            max-width: 900px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero-title span {
+            color: var(--primary-color);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.35rem);
+            color: var(--text-muted);
+            max-width: 650px;
+            line-height: 1.6;
+            font-weight: 400;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        /* Bouton d'action principal CTA */
+        .btn-prime {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            padding: 18px 44px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(230, 126, 34, 0.35);
+            transition: all 0.3s ease-in-out;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .btn-prime:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(230, 126, 34, 0.45);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.7); }
+            70% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 10px rgba(230, 126, 34, 0); }
+            100% { transform: scale(1); opacity: 0; box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer stylisé et fixe en bas */
+        .footer-prime {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(44, 62, 80, 0.05);
+            animation: fadeInUp 0.8s ease-out 0.8s both;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="hero-container">
+        
+        <div class="premium-badge">
+            <div class="pulse-dot"></div>
+            <span class="text-[10px] uppercase font-extrabold tracking-[0.2em] text-slate-500">L'Excellence Prime • En Ligne</span>
+        </div>
+
+        <h1 class="hero-title">
+            Développez vos projets avec <span>Prime Business</span>.
+        </h1>
+
+        <p class="hero-subtitle">
+            Découvrez une plateforme exclusive alliant commerce de confiance, opportunités d'investissement et perspectives de carrière uniques.
+        </p>
+
+        <a id="enter-btn" href="{{ url_for('home') }}" class="btn-prime">
+            Explorer nos opportunités
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+        </a>
+
+    </main>
+
+    <footer class="footer-prime">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-slate-900 text-white flex items-center justify-center font-black rounded-xl text-sm shadow-md">
+                PB
+            </div>
+            <div>
+                <p class="text-[11px] font-black text-slate-800 leading-none tracking-tight">PRIME BUSINESS</p>
+                <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Gold Signature</p>
+            </div>
+        </div>
+        
+        <div class="text-right">
+            <span class="text-[8px] font-black text-slate-400 uppercase block mb-1 tracking-wider">Service Clientèle</span>
+            <a href="https://wa.me/22968593238" target="_blank" class="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm transition hover:border-emerald-500">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-4 h-4" alt="WA">
+                <span class="text-[11px] font-bold text-slate-700">+229 68593238</span>
+            </a>
+        </div>
+    </footer>
+
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6a329cbc66a0b51d461c65e5/1jrd2qrva';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+</body>
+</html>
