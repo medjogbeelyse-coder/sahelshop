@@ -2,47 +2,35 @@ import os
 import requests
 import cloudinary
 import cloudinary.uploader
+import json
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from dotenv import load_dotenv
 
-# 1. Charger le .env local
 load_dotenv()
 
-# 2. Gestion et simulation intelligente de Vercel KV en local
-from vercel_kv import KV
+# --- CLIENT VERCEL KV (API REST) ---
+class VercelKVClient:
+    def __init__(self):
+        self.url = os.getenv("KV_REST_API_URL")
+        self.token = os.getenv("KV_REST_API_TOKEN")
 
-try:
-    # On verifie si on a de VRAIES cles Vercel fonctionnelles dans le .env
-    if os.getenv("VERCEL_KV_URL") and "localhost" not in os.getenv("VERCEL_KV_URL") and "local-mock" not in os.getenv("VERCEL_KV_REST_API_URL"):
-        kv = KV()
-        print("Base de données Vercel KV Reelle connectee avec succes !")
-    else:
-        raise ValueError("Variables Vercel KV manquantes ou fictives.")
-except Exception as e:
-    print("Mode Local active : Utilisation du simulateur de base de donnees integre.")
-    
-    # Ce simulateur remplace Vercel KV sur ton PC pour que rien ne plante sous Windows
-    class LocalMockKV:
-        def __init__(self):
-            # Base de donnees temporaire en memoire
-            self.db = {
-                "flag:commerce": True,
-                "flag:investissement": True,
-                "flag:recrutement": True,
-                "list:postes": ["Developpeur Python", "Acheteur International", "Gestionnaire de Stock"],
-                "dict:produits": {}
-            }
-        def get(self, key):
-            return self.db.get(key, None)
-        def set(self, key, value):
-            self.db[key] = value
-            return True
-        def delete(self, key):
-            if key in self.db:
-                del self.db[key]
-            return True
+    def get(self, key):
+        if not self.url or not self.token: return None
+        try:
+            res = requests.get(f"{self.url}/get/{key}", headers={"Authorization": f"Bearer {self.token}"})
+            return res.json().get("result")
+        except: return None
 
-    kv = LocalMockKV()
+    def set(self, key, value):
+        if not self.url or not self.token: return False
+        try:
+            requests.post(f"{self.url}/set/{key}", 
+                          headers={"Authorization": f"Bearer {self.token}"}, 
+                          data=json.dumps(value))
+            return True
+        except: return False
+
+kv = VercelKVClient()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "prime_business_2026_vercel_key")
