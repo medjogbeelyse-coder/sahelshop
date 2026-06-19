@@ -3,68 +3,76 @@ import requests
 import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
 
-# On force Flask à utiliser le dossier /tmp pour ses données d'instance (évite l'erreur Read-only)
-app = Flask(__name__, instance_path="/tmp/flask_instance")
-app.secret_key = os.environ.get("SECRET_KEY", "prime_business_2026_key")
+# 1. Charger le .env local
+load_dotenv()
 
-# --- 1. CONFIGURATION DE LA BASE ---
-uri = os.environ.get("DATABASE_URL", "sqlite:////tmp/prime_business.db")
+# 2. Gestion et simulation intelligente de Vercel KV en local
+from vercel_kv import KV
 
-# Sécurité supplémentaire : si l'URL commence par postgres:// (sans le ql), on corrige
-if uri and uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
+try:
+    # On verifie si on a de VRAIES cles Vercel fonctionnelles dans le .env
+    if os.getenv("VERCEL_KV_URL") and "localhost" not in os.getenv("VERCEL_KV_URL") and "local-mock" not in os.getenv("VERCEL_KV_REST_API_URL"):
+        kv = KV()
+        print("Base de données Vercel KV Reelle connectee avec succes !")
+    else:
+        raise ValueError("Variables Vercel KV manquantes ou fictives.")
+except Exception as e:
+    print("Mode Local active : Utilisation du simulateur de base de donnees integre.")
+    
+    # Ce simulateur remplace Vercel KV sur ton PC pour que rien ne plante sous Windows
+    class LocalMockKV:
+        def __init__(self):
+            # Base de donnees temporaire en memoire
+            self.db = {
+                "flag:commerce": True,
+                "flag:investissement": True,
+                "flag:recrutement": True,
+                "list:postes": ["Developpeur Python", "Acheteur International", "Gestionnaire de Stock"],
+                "dict:produits": {}
+            }
+        def get(self, key):
+            return self.db.get(key, None)
+        def set(self, key, value):
+            self.db[key] = value
+            return True
+        def delete(self, key):
+            if key in self.db:
+                del self.db[key]
+            return True
 
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-# --- 2. MODÈLES ---
-class Produit(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    designation = db.Column(db.String(100), nullable=False)
-    prix = db.Column(db.Float, nullable=False)
-    section = db.Column(db.String(50), nullable=False)
-    image = db.Column(db.String(255))
-    cloudinary_id = db.Column(db.String(100))
+    kv = LocalMockKV()
 
-class Poste(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    titre = db.Column(db.String(100), nullable=False)
+app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "prime_business_2026_vercel_key")
 
-class FeatureFlag(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.String(50), unique=True, nullable=False)
-    active = db.Column(db.Boolean, default=True)
-
-# --- 3. CONFIGURATION CLOUDINARY SÉCURISÉE ---
+# --- CONFIGURATION CLOUDINARY ---
 cloudinary.config( 
   cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME", "ds5exviel"), 
   api_key = os.environ.get("CLOUDINARY_API_KEY", "128277898241178"), 
-  api_secret = os.environ.get("CLOUDINARY_API_SECRET") # Va lire le secret de manière sécurisée sans l'afficher
+  api_secret = os.environ.get("CLOUDINARY_API_SECRET", "VhODvT9UTr0wim4SZuFPR-UmixE")
 )
 
-# --- 4. INJECTION DES FLAGS ---
+# --- INJECTION DES FLAGS ---
 @app.context_processor
 def inject_flags():
     try:
-        flags = {f.key: f.active for f in FeatureFlag.query.all()}
-        return {'flags': flags}
+        commerce = kv.get("flag:commerce")
+        investissement = kv.get("flag:investissement")
+        recrutement = kv.get("flag:recrutement")
+        
+        return {
+            'flags': {
+                'commerce': commerce if commerce is not None else True,
+                'investissement': investissement if investissement is not None else True,
+                'recrutement': recrutement if recrutement is not None else True
+            }
+        }
     except:
         return {'flags': {'commerce': True, 'investissement': True, 'recrutement': True}}
 
-# --- 5. INITIALISATION DES TABLES ---
-with app.app_context():
-    try:
-        db.create_all()
-        if not FeatureFlag.query.first():
-            for k in ["commerce", "investissement", "recrutement"]:
-                db.session.add(FeatureFlag(key=k, active=True))
-            db.session.commit()
-    except Exception as e:
-        print(f"⚠️ Erreur DB: {e}")
-
-# --- ROUTES ---
+# --- ROUTES DE NAVIGATION ---
 
 @app.route("/")
 def presentation():
@@ -77,180 +85,99 @@ def home():
 @app.route("/section/<name>")
 def view_section(name):
     try:
-        flag = FeatureFlag.query.filter_by(key=name).first()
-        if flag and flag.active:
-            if name == "investissement":
-                return render_template("section_investissement.html")
-            if name == "recrutement":
-                postes_list = Poste.query.all()
-                return render_template("section_recrutement.html", postes=postes_list)
+        name = str(name).strip().lower()
+        
+        # Gestion dynamique et harmonisation de la clé de flag (commerce ou boutique -> commerce)
+        flag_key = "commerce" if name in ["commerce", "boutique"] else name
+        is_active = kv.get(f"flag:{flag_key}")
+        
+        # Si l'administrateur a désactivé cette section, on renvoie la page indisponible
+        if is_active is False:
+            # name.capitalize() permet de mettre une majuscule (ex: "Commerce", "Investissement")
+            return render_template("indisponible.html", section_name=name.capitalize())
+        
+        # Affichage normal si la section est active
+        if name == "investissement":
+            return render_template("section_investissement.html")
             
-            prods = Produit.query.all()
+        if name == "recrutement":
+            postes_list = kv.get("list:postes") or []
+            postes = [{"id": i, "titre": p} for i, p in enumerate(postes_list)]
+            return render_template("section_recrutement.html", postes=postes)
+        
+        if name in ["commerce", "boutique"]:
+            produits_dict = kv.get("dict:produits") or {}
+            prods = []
+            for p_id, p_data in produits_dict.items():
+                prods.append({
+                    "id": p_id,
+                    "designation": p_data.get("designation", ""),
+                    "prix": float(p_data.get("prix", 0)),
+                    "section": p_data.get("section", ""),
+                    "image": p_data.get("image", ""),
+                    "cloudinary_id": p_data.get("cloudinary_id", "")
+                })
             return render_template("section.html", name=name, produits=prods)
-    except:
-        pass
+            
+    except Exception as e:
+        print(f"Erreur section dynamique: {e}")
     return redirect(url_for('home'))
 
+# --- INTERCEPTIONS TELEGRAM ---
 
-# --- API COMMANDE BOUTIQUE VERS TELEGRAM ---
 @app.route("/passer-commande", methods=["POST"])
 def passer_commande():
     data = request.get_json()
-    if not data:
-        return jsonify({"success": False, "message": "Données invalides"}), 400
+    if not data or not all([data.get("nom"), data.get("pays"), data.get("ville"), data.get("telephone"), data.get("panier")]):
+        return jsonify({"success": False, "message": "Données incomplètes"}), 400
 
-    nom = data.get("nom")
-    email = data.get("email", "Non renseigné")  # Récupération de l'email (facultatif)
-    pays = data.get("pays")
-    ville = data.get("ville")
-    telephone = data.get("telephone")
-    telephone2 = data.get("telephone2", "Non renseigné")
-    total_marchandise = data.get("total_marchandise", 0)
-    panier = data.get("panier", [])
-
-    if not all([nom, pays, ville, telephone, panier]):
-        return jsonify({"success": False, "message": "Informations de livraison incomplètes"}), 400
-
-    # Formatage de la liste des produits du panier en HTML pour Telegram
     texte_panier = ""
     total_financier = 0
-    for item in panier:
+    for item in data['panier']:
         sous_total = item['price'] * item['quantity']
         total_financier += sous_total
         texte_panier += f"• <b>{item['name']}</b> (x{item['quantity']}) — {sous_total:,} F\n"
 
-    # Construction du message structuré
-    message_telegram = (
-        f"📦 <b>NOUVELLE COMMANDE REÇUE !</b>\n"
-        f"━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"👤 <b>Client :</b> {nom}\n"
-        f"📧 <b>E-mail :</b> {email}\n"
-        f"🌍 <b>Destination :</b> {pays} ({ville})\n"
-        f"📞 <b>Tél 1 :</b> {telephone}\n"
-        f"📱 <b>Tél 2 :</b> {telephone2}\n\n"
-        f"🛒 <b>Détails des articles :</b>\n{texte_panier}\n"
-        f"🔢 <b>Nombre total d'articles :</b> {total_marchandise}\n"
-        f"💵 <b>TOTAL À PERCEVOIR : {total_financier:,} F</b>\n"
-        f"━━━━━━━━━━━━━━━━━━━━━"
+    message = (
+        f"📦 <b>NOUVELLE COMMANDE REÇUE !</b>\n━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"👤 <b>Client :</b> {data['nom']}\n📧 <b>E-mail :</b> {data.get('email', 'Non renseigné')}\n"
+        f"🌍 <b>Destination :</b> {data['pays']} ({data['ville']})\n📞 <b>Tél 1 :</b> {data['telephone']}\n"
+        f"🛒 <b>Détails :</b>\n{texte_panier}\n💵 <b>TOTAL : {total_financier:,} F</b>\n━━━━━━━━━━━━━━━━━━━━━"
     )
+    return envoyer_telegram(message)
 
-    bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-
-    if bot_token and chat_id:
-        url_telegram = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        payload = {
-            "chat_id": chat_id,
-            "text": message_telegram,
-            "parse_mode": "HTML"
-        }
-        try:
-            response = requests.post(url_telegram, json=payload)
-            if response.status_code == 200:
-                return jsonify({"success": True})
-            else:
-                return jsonify({"success": False, "message": "Échec de l'envoi de la notification Telegram"}), 500
-        except Exception as e:
-            return jsonify({"success": False, "message": str(e)}), 500
-    else:
-        return jsonify({"success": False, "message": "Configuration Telegram manquante sur le serveur"}), 500
-
-
-# --- API INVESTISSEMENT VERS TELEGRAM ---
 @app.route("/api/investissement", methods=["POST"])
 def api_investissement():
-    data = request.get_json()
-    if not data:
-        return jsonify({"status": "error", "message": "Données invalides"}), 400
-
-    nom = data.get("nom", "Non spécifié")
-    pays = data.get("pays", "Non spécifié")
-    ville = data.get("ville", "Non spécifié")
-    tel = data.get("tel", "Non spécifié")
-    montant = data.get("montant", "Non spécifié")
-
-    # Message formaté proprement pour Telegram
-    message_telegram = (
+    data = request.get_json() or {}
+    message = (
         "📈 *Nouvelle Demande d'Investissement* 📈\n\n"
-        f"👤 *Nom :* {nom}\n"
-        f"🌍 *Pays :* {pays}\n"
-        f"🏙️ *Ville :* {ville}\n"
-        f"📞 *Téléphone :* {tel}\n"
-        f"💰 *Montant :* {montant} FCFA\n"
+        f"👤 *Nom :* {data.get('nom')}\n🌍 *Pays :* {data.get('pays')}\n"
+        f"🏙️ *Ville :* {data.get('ville')}\n📞 *Téléphone :* {data.get('tel')}\n"
+        f"💰 *Montant :* {data.get('montant')} FCFA\n"
     )
+    return envoyer_telegram(message, mode="Markdown")
 
-    bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-
-    if bot_token and chat_id:
-        url_telegram = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        payload = {
-            "chat_id": chat_id,
-            "text": message_telegram,
-            "parse_mode": "Markdown"
-        }
-        try:
-            response = requests.post(url_telegram, json=payload)
-            if response.status_code == 200:
-                return jsonify({"status": "success", "message": "Notification envoyée"})
-            else:
-                return jsonify({"status": "error", "message": "Échec de l'API Telegram"}), 500
-        except Exception as e:
-            return jsonify({"status": "error", "message": str(e)}), 500
-    else:
-        return jsonify({"status": "error", "message": "Configuration Telegram manquante"}), 500
-
-
-# --- API RECRUTEMENT VERS TELEGRAM ---
 @app.route("/soumettre-candidature", methods=["POST"])
 def soumettre_candidature():
-    data = request.get_json()
-    if not data:
-        return jsonify({"status": "error", "message": "Données invalides"}), 400
-
-    nom = data.get("nom")
-    annee = data.get("annee")
-    nat = data.get("nat")
-    poste = data.get("poste")
-
-    if not all([nom, annee, nat, poste]):
-        return jsonify({"status": "error", "message": "Champs obligatoires manquants"}), 400
-
-    # Formatage structuré de la fiche de candidature
-    message_telegram = (
-        f"🏛 *RÉSEAU MEDJOGBE | Nouvelle Candidature*\n"
-        f"━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"👤 *Nom & Prénom :* {nom}\n"
-        f"📅 *Année de Naissance :* {annee}\n"
-        f"🌍 *Nationalité :* {nat}\n"
-        f"💼 *Poste Souhaité :* {poste}\n\n"
-        f"⚖️ _Dossier enregistré via le portail web._\n"
-        f"━━━━━━━━━━━━━━━━━━━━━"
+    data = request.get_json() or {}
+    message = (
+        f"💼 *Nouvelle Candidature*\n"
+        f"👤 *Nom :* {data.get('nom')}\n📅 *Année :* {data.get('annee')}\n"
+        f"🌍 *Nationalité :* {data.get('nat')}\n🎯 *Poste :* {data.get('poste')}"
     )
+    return envoyer_telegram(message, mode="Markdown")
 
-    bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+def envoyer_telegram(texte, mode="HTML"):
+    token = os.environ.get("TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    try:
+        res = requests.post(url, json={"chat_id": chat_id, "text": texte, "parse_mode": mode})
+        return jsonify({"success": res.status_code == 200, "status": "success" if res.status_code == 200 else "error"})
+    except:
+        return jsonify({"success": False, "status": "error"}), 500
 
-    if bot_token and chat_id:
-        url_telegram = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        payload = {
-            "chat_id": chat_id,
-            "text": message_telegram,
-            "parse_mode": "Markdown"
-        }
-        try:
-            response = requests.post(url_telegram, json=payload)
-            if response.status_code == 200:
-                return jsonify({"status": "success"})
-            else:
-                return jsonify({"status": "error", "message": "Échec de l'envoi de la candidature à Telegram"}), 500
-        except Exception as e:
-            return jsonify({"status": "error", "message": str(e)}), 500
-    else:
-        return jsonify({"status": "error", "message": "Configuration Telegram manquante sur le serveur"}), 500
-
-
-# --- ROUTES D'ADMINISTRATION RE-SÉCURISÉES ---
+# --- PANNEAU D'ADMINISTRATION (/MEDJOGBE11) ---
 
 @app.route("/MEDJOGBE11", methods=["GET", "POST"])
 def admin_login():
@@ -266,53 +193,81 @@ def admin_panel():
     if not session.get("admin_logged_in"):
         return redirect(url_for("admin_login"))
 
-    try:
-        if request.method == "POST":
-            if "flag_key" in request.form:
-                f = FeatureFlag.query.filter_by(key=request.form.get("flag_key")).first()
-                if f:
-                    f.active = not f.active
-                    db.session.commit()
+    if request.method == "POST":
+        if "flag_key" in request.form:
+            key = request.form.get("flag_key")
+            current = kv.get(f"flag:{key}")
+            current = True if current is None else current
+            kv.set(f"flag:{key}", not current)
+        
+        elif "designation" in request.form:
+            file = request.files.get('image_file')
+            img_url, p_id = "", ""
+            if file and file.filename != '':
+                res = cloudinary.uploader.upload(file)
+                img_url, p_id = res['secure_url'], res['public_id']
             
-            elif "designation" in request.form:
-                file = request.files.get('image_file')
-                img_url, p_id = "", ""
-                if file and file.filename != '':
-                    res = cloudinary.uploader.upload(file)
-                    img_url, p_id = res['secure_url'], res['public_id']
-                
-                new_p = Produit(designation=request.form.get("designation"), 
-                                prix=float(request.form.get("price")),
-                                section=request.form.get("category"), 
-                                image=img_url, cloudinary_id=p_id)
-                db.session.add(new_p)
-                db.session.commit()
+            import time
+            new_id = str(int(time.time()))
+            
+            produits_dict = kv.get("dict:produits") or {}
+            produits_dict[new_id] = {
+                "designation": request.form.get("designation"),
+                "prix": request.form.get("price"),
+                "section": request.form.get("category"),
+                "image": img_url,
+                "cloudinary_id": p_id
+            }
+            kv.set("dict:produits", produits_dict)
 
-            elif "delete_id" in request.form:
-                p = Produit.query.get(int(request.form.get("delete_id")))
-                if p:
-                    if p.cloudinary_id: cloudinary.uploader.destroy(p.cloudinary_id)
-                    db.session.delete(p)
-                    db.session.commit()
+        elif "delete_id" in request.form:
+            del_id = request.form.get("delete_id")
+            produits_dict = kv.get("dict:produits") or {}
+            
+            if del_id in produits_dict:
+                p_data = produits_dict[del_id]
+                if p_data.get("cloudinary_id"):
+                    cloudinary.uploader.destroy(p_data.get("cloudinary_id"))
+                del produits_dict[del_id]
+                kv.set("dict:produits", produits_dict)
 
-            elif "titre_poste" in request.form:
-                db.session.add(Poste(titre=request.form.get("titre_poste")))
-                db.session.commit()
+        elif "titre_poste" in request.form:
+            postes_list = kv.get("list:postes") or []
+            postes_list.append(request.form.get("titre_poste"))
+            kv.set("list:postes", postes_list)
 
-            elif "delete_poste_id" in request.form:
-                po = Poste.query.get(int(request.form.get("delete_poste_id")))
-                if po:
-                    db.session.delete(po)
-                    db.session.commit()
+        elif "delete_poste_id" in request.form:
+            try:
+                idx = int(request.form.get("delete_poste_id"))
+                postes_list = kv.get("list:postes") or []
+                if 0 <= idx < len(postes_list):
+                    postes_list.pop(idx)
+                    kv.set("list:postes", postes_list)
+            except:
+                pass
 
-            return redirect(url_for("admin_panel"))
+        return redirect(url_for("admin_panel"))
 
-        return render_template("admin_panel.html", 
-                               flags={f.key: f.active for f in FeatureFlag.query.all()}, 
-                               produits=Produit.query.all(), 
-                               postes=Poste.query.all())
-    except Exception as e:
-        return f"Erreur: {str(e)}"
+    postes_list = kv.get("list:postes") or []
+    postes = [{"id": i, "titre": p} for i, p in enumerate(postes_list)]
+    
+    produits_dict = kv.get("dict:produits") or {}
+    produits = []
+    for k, v in produits_dict.items():
+        v["id"] = k
+        try:
+            v["prix"] = float(v.get("prix", 0))
+        except:
+            v["prix"] = 0.0
+        produits.append(v)
+
+    flags = {
+        "commerce": kv.get("flag:commerce") if kv.get("flag:commerce") is not None else True,
+        "investissement": kv.get("flag:investissement") if kv.get("flag:investissement") is not None else True,
+        "recrutement": kv.get("flag:recrutement") if kv.get("flag:recrutement") is not None else True
+    }
+
+    return render_template("admin_panel.html", flags=flags, produits=produits, postes=postes)
 
 @app.route("/MEDJOGBE11/logout")
 def admin_logout():

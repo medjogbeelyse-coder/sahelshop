@@ -81,7 +81,7 @@
                         {{ p.section|upper }}
                     </span>
                 </td>
-                <td class="p-3">{{ "{:,.0f}".format(p.prix) }} F</td>
+                <td class="p-3">{{ "{:,.0f}".format(p.prix | float) }} F</td>
                 <td class="p-3">
                     <form method="POST" onsubmit="return confirm('Supprimer cet article ?');">
                         <input type="hidden" name="delete_id" value="{{ p.id }}">
