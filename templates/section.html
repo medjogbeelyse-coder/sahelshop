@@ -41,8 +41,10 @@
 <button class="chip" data-cat="homme" onclick="setCategory('homme',this)">Homme</button>
 <button class="chip" data-cat="femme" onclick="setCategory('femme',this)">Femme</button>
 <button class="chip" data-cat="enfant" onclick="setCategory('enfant',this)">Enfant</button>
-<button class="chip" data-cat="chaussures" onclick="setCategory('chaussures',this)">Chaussures</button>
 <button class="chip" data-cat="sacs" onclick="setCategory('sacs',this)">Sacs</button>
+<button class="chip" data-cat="chaussures_homme" onclick="setCategory('chaussures_homme',this)">Chaussures homme</button>
+<button class="chip" data-cat="chaussures_bebe" onclick="setCategory('chaussures_bebe',this)">Chaussures bébé</button>
+<button class="chip" data-cat="chaussures_femme" onclick="setCategory('chaussures_femme',this)">Chaussures femme</button>
 <button class="chip" data-cat="accessoires" onclick="setCategory('accessoires',this)">Accessoires</button>
 <button class="chip" data-cat="traditionnel" onclick="setCategory('traditionnel',this)">Traditionnel</button>
 <button class="chip" data-cat="promotions" onclick="setCategory('promotions',this)">Promotions</button>
@@ -64,7 +66,7 @@
 </form></section></div>
 <script>
 const products = {{ produits|tojson }};
-const labels={homme:"Homme",femme:"Femme",enfant:"Enfant",chaussures:"Chaussures",sacs:"Sacs",accessoires:"Accessoires",traditionnel:"Tenues traditionnelles",promotions:"Promotions",nouveautes:"Nouveautés",commerce_gem:"Homme",commerce_marche:"Femme"};
+const labels={homme:"Homme",femme:"Femme",enfant:"Enfant",chaussures:"Chaussures",chaussures_homme:"Chaussures homme",chaussures_bebe:"Chaussures bébé",chaussures_femme:"Chaussures femme",sacs:"Sacs",accessoires:"Accessoires",traditionnel:"Tenues traditionnelles",promotions:"Promotions",nouveautes:"Nouveautés",commerce_gem:"Homme",commerce_marche:"Femme"};
 let category="all",cart=JSON.parse(localStorage.getItem("sahel_cart")||"[]");
 const money=n=>new Intl.NumberFormat("fr-FR").format(Number(n)||0)+" F CFA";
 function setCategory(c,b){category=c;document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderProducts()}
@@ -78,7 +80,7 @@ function renderWomenHighlights(){
 function renderProducts(){
  let q=document.getElementById("search").value.toLowerCase(),sort=document.getElementById("sort").value;
  let list=products.filter(p=>(category==="all"||p.section===category||(category==="homme"&&p.section==="commerce_gem")||(category==="femme"&&p.section==="commerce_marche"))&&((p.designation||"").toLowerCase().includes(q)));
- if(sort==="priceUp")list.sort((a,b)=>a.prix-b.prix);if(sort==="priceDown")list.sort((a,b)=>b.prix-a.prix);
+ if(sort==="recent"){const order={sacs:0,chaussures_homme:1,chaussures_bebe:2,chaussures_femme:3,homme:4,femme:5,enfant:6,traditionnel:7,chaussures:8,accessoires:9};list.sort((a,b)=>(order[a.section]??10)-(order[b.section]??10));}if(sort==="priceUp")list.sort((a,b)=>a.prix-b.prix);if(sort==="priceDown")list.sort((a,b)=>b.prix-a.prix);
  document.getElementById("resultCount").textContent=list.length+" article(s)";
  document.getElementById("productGrid").innerHTML=list.length?list.map(p=>'<article class="product"><img src="'+(p.image||"")+'" alt="" onerror="this.style.display=\'none\'"><div class="product-info"><p class="gold text-[10px] uppercase tracking-wider font-bold">'+(labels[p.section]||"Collection")+'</p><h3 class="font-bold text-sm mt-1">'+esc(p.designation)+'</h3><p class="font-extrabold mt-3 mb-4">'+money(p.prix)+'</p><button class="btn mt-auto" onclick="addToCart('+JSON.stringify(String(p.id))+')">Ajouter au panier</button></div></article>').join(""):'<div class="empty col-span-full"><p class="font-bold mb-2">Aucun article dans cette catégorie pour le moment.</p><p class="text-xs">Les nouveaux articles seront affichés dès leur publication par la boutique.</p></div>';
 }
