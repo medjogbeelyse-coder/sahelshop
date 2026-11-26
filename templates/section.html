@@ -31,7 +31,7 @@
 </div>
 <div id="womenHighlights" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5"></div>
 </section>
-<section id="catalogue" class="py-5">
+<section class="mb-10 mt-2"><div class="mb-4"><p class="gold text-xs tracking-[.2em] font-bold uppercase">À l’honneur</p><h2 class="serif text-3xl mt-1">Mode femme & sacs tendance</h2><p class="muted text-sm mt-2">Robes, ensembles et une belle sélection de sacs à main à petits prix.</p></div><div id="womenHighlights" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5"></div></section><section id="catalogue" class="py-5">
 <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
 <div><p class="gold text-xs tracking-[.2em] font-bold uppercase">La sélection</p><h2 class="serif text-3xl mt-1">La boutique</h2><p class="muted text-sm mt-2">Catalogue de présentation : prix et disponibilités des modèles de démonstration à confirmer auprès de la boutique.</p></div>
 <input id="search" class="field md:max-w-xs" style="margin:0" placeholder="Rechercher un article…" oninput="renderProducts()">
@@ -74,6 +74,7 @@ function renderWomenHighlights(){
  if(!target)return;
  target.innerHTML=picks.map(p=>'<article class="product"><img src="'+(p.image||"")+'" alt="'+esc(p.designation)+'" loading="lazy" onerror="this.style.display=\'none\'"><div class="product-info"><p class="gold text-[10px] uppercase tracking-wider font-bold">'+(p.section==="sacs"?"Sacs femme":"Mode femme")+'</p><h3 class="font-bold text-sm mt-1">'+esc(p.designation)+'</h3><p class="font-extrabold mt-3 mb-4">'+money(p.prix)+'</p><button class="btn mt-auto" onclick="addToCart('+JSON.stringify(String(p.id))+')">Ajouter au panier</button></div></article>').join("");
 }
+function renderWomenHighlights(){const picks=products.filter(p=>p.section==="femme"||p.section==="sacs").slice(0,12);const target=document.getElementById("womenHighlights");if(!target)return;target.innerHTML=picks.map(p=>'<article class="product"><img src="'+(p.image||"")+'" alt="" loading="lazy" onerror="this.style.display=\'none\'"><div class="product-info"><p class="gold text-[10px] uppercase tracking-wider font-bold">'+(p.section==="sacs"?"Sacs femme":"Mode femme")+'</p><h3 class="font-bold text-sm mt-1">'+esc(p.designation)+'</h3><p class="font-extrabold mt-3 mb-4">'+money(p.prix)+'</p><button class="btn mt-auto" onclick="addToCart('+JSON.stringify(String(p.id))+')">Ajouter au panier</button></div></article>').join("");}
 function renderProducts(){
  let q=document.getElementById("search").value.toLowerCase(),sort=document.getElementById("sort").value;
  let list=products.filter(p=>(category==="all"||p.section===category||(category==="homme"&&p.section==="commerce_gem")||(category==="femme"&&p.section==="commerce_marche"))&&((p.designation||"").toLowerCase().includes(q)));
@@ -88,6 +89,6 @@ function updateCart(){document.getElementById("cartCount").textContent=cart.redu
 function changeQty(i,n){cart[i].quantity+=n;if(cart[i].quantity<=0)cart.splice(i,1);persist()}function removeLine(i){cart.splice(i,1);persist()}
 function openCart(){document.getElementById("cartOverlay").classList.add("show")}function closeCart(){document.getElementById("cartOverlay").classList.remove("show")}function openCheckout(){if(!cart.length)return;closeCart();document.getElementById("checkoutOverlay").classList.add("show")}function closeCheckout(){document.getElementById("checkoutOverlay").classList.remove("show")}
 document.getElementById("orderForm").addEventListener("submit",async e=>{e.preventDefault();let f=new FormData(e.target),data=Object.fromEntries(f.entries());data.panier=cart.map(x=>({name:x.name,price:x.price,quantity:x.quantity}));let msg=document.getElementById("orderMessage");msg.textContent="Envoi de votre commande…";try{let r=await fetch("/passer-commande",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});let j=await r.json();if(!r.ok||!j.success)throw Error();msg.textContent="Commande transmise. Merci pour votre confiance.";cart=[];persist();e.target.reset()}catch(err){msg.textContent="L'envoi a échoué. Vérifiez votre connexion ou réessayez."}});
-renderWomenHighlights();renderProducts();updateCart();
+renderWomenHighlights();renderWomenHighlights();renderProducts();updateCart();
 </script>
 </body></html>
