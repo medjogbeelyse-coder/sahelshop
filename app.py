@@ -809,10 +809,10 @@ def passer_commande():
 
     safe = lambda value: html.escape(str(value))
     item_lines = "\n".join([
-        "• <b>" + safe(x["name"]) + "</b>\\n"
-        + "   Référence : <code>" + safe(x["id"]) + "</code> | Catégorie : " + safe(x.get("section") or "Non précisée") + "\\n"
+        "• <b>" + safe(x["name"]) + "</b>\n"
+        + "   Référence : <code>" + safe(x["id"]) + "</code> | Catégorie : " + safe(x.get("section") or "Non précisée") + "\n"
         + "   Quantité : " + str(x["quantity"]) + " × " + format(x["price"], ",") + " F = <b>" + format(x["subtotal"], ",") + " F</b>"
-        + ("\\n   📷 <a href=\"" + safe(x["image"]) + "\">Voir la photo de cet article</a>" if x.get("image") else "\\n   📷 Photo non disponible")
+        + ("\n   📷 <a href=\"" + safe(x["image"]) + "\">Voir la photo de cet article</a>" if x.get("image") else "\n   📷 Photo non disponible")
         for x in order["items"]
     ])
     message = (
