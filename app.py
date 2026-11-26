@@ -458,28 +458,50 @@ DEMO_CATALOG = {
     }
 }
 
-# --- CLIENT VERCEL KV (API REST) ---
+# --- CLIENT VERCEL KV (UPSTASH REDIS REST) ---
 class VercelKVClient:
     def __init__(self):
-        self.url = os.getenv("KV_REST_API_URL")
-        self.token = os.getenv("KV_REST_API_TOKEN")
+        self.url = (os.getenv("KV_REST_API_URL") or "").strip().rstrip("/")
+        self.token = (os.getenv("KV_REST_API_TOKEN") or "").strip()
+
+    def _command(self, command):
+        if not self.url or not self.token:
+            raise RuntimeError("Variables KV_REST_API_URL ou KV_REST_API_TOKEN absentes.")
+        res = requests.post(
+            self.url,
+            headers={"Authorization": f"Bearer {self.token}"},
+            json=command,
+            timeout=8
+        )
+        res.raise_for_status()
+        payload = res.json()
+        if isinstance(payload, dict) and payload.get("error"):
+            raise RuntimeError(str(payload["error"])[:240])
+        return payload.get("result") if isinstance(payload, dict) else None
 
     def get(self, key):
-        if not self.url or not self.token: return None
         try:
-            res = requests.get(f"{self.url}/get/{key}", headers={"Authorization": f"Bearer {self.token}"})
-            return res.json().get("result")
-        except: return None
+            value = self._command(["GET", str(key)])
+            if isinstance(value, str):
+                try:
+                    return json.loads(value)
+                except (ValueError, TypeError):
+                    return value
+            return value
+        except Exception as exc:
+            print(f"[KV] GET impossible pour {key}: {type(exc).__name__}: {str(exc)[:240]}")
+            return None
 
     def set(self, key, value):
-        if not self.url or not self.token: return False
         try:
-            res = requests.post(f"{self.url}/set/{key}",
-                                headers={"Authorization": f"Bearer {self.token}"},
-                                data=json.dumps(value), timeout=8)
-            res.raise_for_status()
-            return True
-        except: return False
+            result = self._command(["SET", str(key), json.dumps(value, ensure_ascii=False)])
+            if result == "OK":
+                return True
+            print(f"[KV] SET refusé pour {key}: résultat inattendu ({result!r})")
+            return False
+        except Exception as exc:
+            print(f"[KV] SET impossible pour {key}: {type(exc).__name__}: {str(exc)[:240]}")
+            return False
 
 kv = VercelKVClient()
 
@@ -846,6 +868,10 @@ def envoyer_telegram(texte, mode="HTML"):
         except ValueError:
             payload = {}
         ok = res.ok and payload.get("ok") is True
+        if not ok:
+            print(f"[TELEGRAM] Échec HTTP {res.status_code}: {str(payload.get('description', 'réponse invalide'))[:240]}")
+        else:
+            print("[TELEGRAM] Message accepté par l'API.")
         response = jsonify({
             "success": ok,
             "status": "success" if ok else "telegram_error",
@@ -853,7 +879,8 @@ def envoyer_telegram(texte, mode="HTML"):
         })
         response.status_code = 200 if ok else 502
         return response
-    except requests.RequestException:
+    except requests.RequestException as exc:
+        print(f"[TELEGRAM] Erreur réseau: {type(exc).__name__}: {str(exc)[:240]}")
         response = jsonify({"success": False, "status": "network_error", "message": "Connexion à Telegram impossible."})
         response.status_code = 502
         return response
