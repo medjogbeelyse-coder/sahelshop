@@ -490,7 +490,8 @@ class VercelKVClient:
                     return value
             return value
         except Exception as exc:
-            print(f"[KV] GET impossible pour {key}: {type(exc).__name__}: {str(exc)[:240]}")
+            self.last_error = f"{type(exc).__name__}: {str(exc)[:240]}"
+            print(f"[KV] GET impossible pour {key}: {self.last_error}")
             return None
 
     def set(self, key, value):
@@ -565,8 +566,14 @@ def view_section(name):
             
         if name == "recrutement":
             postes_list = kv.get("list:postes") or []
-            postes = [{"id": i, "titre": p} for i, p in enumerate(postes_list)]
-            return render_template("section_recrutement.html", postes=postes)
+            storage_error = bool(kv.last_error)
+            if not isinstance(postes_list, list):
+                postes_list = []
+            postes = [
+                {"id": i, "titre": p.get("titre", "") if isinstance(p, dict) else str(p)}
+                for i, p in enumerate(postes_list)
+            ]
+            return render_template("section_recrutement.html", postes=postes, storage_error=storage_error)
         
         if name in ["commerce", "boutique"]:
             produits_dict = kv.get("dict:produits") or {}
@@ -924,25 +931,42 @@ def admin_panel():
         if "titre_poste" in request.form:
             titre = str(request.form.get("titre_poste", "")).strip()[:120]
             if titre:
+                kv.last_error = ""
                 postes_list = kv.get("list:postes") or []
-                if not isinstance(postes_list, list):
-                    postes_list = []
-                postes_list.append(titre)
-                kv.set("list:postes", postes_list)
+                if kv.last_error:
+                    flash("Impossible de lire les offres : la base de données est indisponible. Aucune modification n'a été enregistrée.")
+                else:
+                    if not isinstance(postes_list, list):
+                        postes_list = []
+                    postes_list.append(titre)
+                    if kv.set("list:postes", postes_list):
+                        flash("Offre publiée avec succès.")
+                    else:
+                        flash("Échec de l'enregistrement : la base de données est indisponible. L'offre n'a pas été publiée.")
 
         elif "delete_poste_id" in request.form:
             try:
                 idx = int(request.form.get("delete_poste_id"))
+                kv.last_error = ""
                 postes_list = kv.get("list:postes") or []
-                if isinstance(postes_list, list) and 0 <= idx < len(postes_list):
+                if kv.last_error:
+                    flash("Impossible de lire les offres : la base de données est indisponible.")
+                elif isinstance(postes_list, list) and 0 <= idx < len(postes_list):
                     postes_list.pop(idx)
-                    kv.set("list:postes", postes_list)
+                    if kv.set("list:postes", postes_list):
+                        flash("Offre supprimée.")
+                    else:
+                        flash("Échec de la suppression : la base de données est indisponible.")
             except (TypeError, ValueError):
-                pass
+                flash("Demande de suppression invalide.")
 
         return redirect(url_for("admin_panel"))
 
+    kv.last_error = ""
     postes_list = kv.get("list:postes") or []
+    storage_error = bool(kv.last_error)
+    if storage_error:
+        flash("La base de données des offres est actuellement indisponible. Les offres ne peuvent pas être chargées ni publiées.")
     if not isinstance(postes_list, list):
         postes_list = []
     postes = [
@@ -950,7 +974,7 @@ def admin_panel():
         for i, p in enumerate(postes_list)
     ]
 
-    return render_template("admin_panel.html", postes=postes)
+    return render_template("admin_panel.html", postes=postes, storage_error=storage_error)
 
 @app.route("/MEDJOGBE11/logout")
 def admin_logout():
