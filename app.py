@@ -96,7 +96,7 @@ def view_section(name):
         if name in ["commerce", "boutique"]:
             produits_dict = kv.get("dict:produits") or {}
             prods = []
-            if produits_dict:
+            if False and produits_dict:
                 for p_id, p_data in produits_dict.items():
                     prods.append({
                         "id": p_id,
@@ -154,21 +154,21 @@ def view_section(name):
                     {"id":"demo-42","designation":"Sac à main noir","prix":3000,"section":"sacs","image":"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-43","designation":"Sac à main rose","prix":3500,"section":"sacs","image":"https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-44","designation":"Pochette de sortie femme","prix":2000,"section":"sacs","image":"https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-45","designation":"Derbies homme en cuir ciré noir","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-46","designation":"Mocassins homme en cuir ciré","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1614252369475-53139f2c1b1b?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-47","designation":"Richelieus homme en cuir ciré","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-48","designation":"Chaussures homme en cuir ciré marron","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-49","designation":"Derbies homme en cuir ciré bout carré","prix":2500,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1495555961986-6d4c1ecb7be3?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-50","designation":"Mocassins homme en cuir ciré à boucle","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-51","designation":"Chaussures habillées homme cuir ciré noir","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1460353581641-37bADDab0fa2?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-52","designation":"Derbies homme cuir ciré élégants","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-53","designation":"Chaussures homme cérémonie cuir ciré","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-54","designation":"Mocassins homme cuir ciré classiques","prix":2500,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-55","designation":"Richelieus homme cuir ciré à lacets","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1495555961986-6d4c1ecb7be3?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-56","designation":"Chaussures homme cuir ciré","prix":2500,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-57","designation":"Derbies homme cuir ciré marron foncé","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1460353581641-37bADDab0fa2?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-58","designation":"Mocassins homme cuir ciré souples","prix":2500,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-59","designation":"Chaussures homme cuir ciré brillantes","prix":3000,"section":"chaussures_homme","image":"https://images.unsplash.com/photo-1614252369475-53139f2c1b1b?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-45","designation":"Derbies homme en cuir ciré noir","prix":3000,"section":"chaussures_homme","image":"https://iconsfootwear.com/cdn/shop/files/1_26eaefc0-a0ff-4e90-a9cc-f309056e16ed.png?v=1760876636&width=1080","demo":True},
+                    {"id":"demo-46","designation":"Mocassins homme en cuir ciré","prix":3000,"section":"chaussures_homme","image":"https://gomilaintersole.pk/cdn/shop/products/99.jpg?v=1735003165&width=1200","demo":True},
+                    {"id":"demo-47","designation":"Richelieus homme en cuir ciré","prix":3000,"section":"chaussures_homme","image":"https://y6fsbg-nc.myshopify.com/cdn/shop/files/PolishedBlackOxfordShoesShowcase.png?v=1791136682&width=720","demo":True},
+                    {"id":"demo-48","designation":"Chaussures homme en cuir ciré marron","prix":3000,"section":"chaussures_homme","image":"https://gomilaintersole.pk/cdn/shop/products/99.jpg?v=1735003165&width=1200","demo":True},
+                    {"id":"demo-49","designation":"Derbies homme en cuir ciré bout carré","prix":2500,"section":"chaussures_homme","image":"https://iconsfootwear.com/cdn/shop/files/1_26eaefc0-a0ff-4e90-a9cc-f309056e16ed.png?v=1760876636&width=1080","demo":True},
+                    {"id":"demo-50","designation":"Mocassins homme en cuir ciré à boucle","prix":3000,"section":"chaussures_homme","image":"https://y6fsbg-nc.myshopify.com/cdn/shop/files/PolishedBlackOxfordShoesShowcase.png?v=1791136682&width=720","demo":True},
+                    {"id":"demo-51","designation":"Chaussures habillées homme cuir ciré noir","prix":3000,"section":"chaussures_homme","image":"https://iconsfootwear.com/cdn/shop/files/1_26eaefc0-a0ff-4e90-a9cc-f309056e16ed.png?v=1760876636&width=1080","demo":True},
+                    {"id":"demo-52","designation":"Derbies homme cuir ciré élégants","prix":3000,"section":"chaussures_homme","image":"https://gomilaintersole.pk/cdn/shop/products/99.jpg?v=1735003165&width=1200","demo":True},
+                    {"id":"demo-53","designation":"Chaussures homme cérémonie cuir ciré","prix":3000,"section":"chaussures_homme","image":"https://y6fsbg-nc.myshopify.com/cdn/shop/files/PolishedBlackOxfordShoesShowcase.png?v=1791136682&width=720","demo":True},
+                    {"id":"demo-54","designation":"Mocassins homme cuir ciré classiques","prix":2500,"section":"chaussures_homme","image":"https://gomilaintersole.pk/cdn/shop/products/99.jpg?v=1735003165&width=1200","demo":True},
+                    {"id":"demo-55","designation":"Richelieus homme cuir ciré à lacets","prix":3000,"section":"chaussures_homme","image":"https://iconsfootwear.com/cdn/shop/files/1_26eaefc0-a0ff-4e90-a9cc-f309056e16ed.png?v=1760876636&width=1080","demo":True},
+                    {"id":"demo-56","designation":"Chaussures homme cuir ciré","prix":2500,"section":"chaussures_homme","image":"https://y6fsbg-nc.myshopify.com/cdn/shop/files/PolishedBlackOxfordShoesShowcase.png?v=1791136682&width=720","demo":True},
+                    {"id":"demo-57","designation":"Derbies homme cuir ciré marron foncé","prix":3000,"section":"chaussures_homme","image":"https://gomilaintersole.pk/cdn/shop/products/99.jpg?v=1735003165&width=1200","demo":True},
+                    {"id":"demo-58","designation":"Mocassins homme cuir ciré souples","prix":2500,"section":"chaussures_homme","image":"https://iconsfootwear.com/cdn/shop/files/1_26eaefc0-a0ff-4e90-a9cc-f309056e16ed.png?v=1760876636&width=1080","demo":True},
+                    {"id":"demo-59","designation":"Chaussures homme cuir ciré brillantes","prix":3000,"section":"chaussures_homme","image":"https://y6fsbg-nc.myshopify.com/cdn/shop/files/PolishedBlackOxfordShoesShowcase.png?v=1791136682&width=720","demo":True},
                     {"id":"demo-60","designation":"Chaussures bébé premiers pas","prix":1500,"section":"chaussures_bebe","image":"https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-61","designation":"Baskets bébé souples","prix":2000,"section":"chaussures_bebe","image":"https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-62","designation":"Petits mocassins bébé","prix":2500,"section":"chaussures_bebe","image":"https://images.unsplash.com/photo-1503919005314-30d93d07d823?auto=format&fit=crop&w=700&q=80","demo":True},
@@ -200,8 +200,24 @@ def view_section(name):
                     {"id":"demo-88","designation":"Ballerines femme chic","prix":2000,"section":"chaussures_femme","image":"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-89","designation":"Escarpins femme sobres","prix":2500,"section":"chaussures_femme","image":"https://images.unsplash.com/photo-1560343090-f0409e92791a?auto=format&fit=crop&w=700&q=80","demo":True}
                 ]
+            # Ajouter les articles déjà enregistrés au catalogue de démonstration, sans doublons.
+            # Ainsi, un catalogue KV non vide ne masque plus les catégories de démonstration.
+            if produits_dict:
+                demo_existing_ids = {str(p.get("id")) for p in prods}
+                for p_id, p_data in produits_dict.items():
+                    if str(p_id) not in demo_existing_ids:
+                        prods.append({
+                            "id": p_id,
+                            "designation": p_data.get("designation", ""),
+                            "prix": float(p_data.get("prix", 0)),
+                            "section": p_data.get("section", ""),
+                            "image": p_data.get("image", ""),
+                            "cloudinary_id": p_data.get("cloudinary_id", ""),
+                            "demo": False
+                        })
+
             # Illustrations de démonstration : 20 silhouettes et coloris réellement distincts.
-            if not produits_dict:
+            if True:
                 import base64
                 import urllib.parse
                 bag_styles = [["Sac cabas structuré beige","#c9a77a","M8 43 Q8 35 18 35 H82 Q92 35 92 43 L88 91 H12 Z","M28 37 V25 Q28 8 50 8 Q72 8 72 25 V37"],["Sac bandoulière rouge","#b94743","M16 42 Q16 34 25 34 H75 Q84 34 84 42 L80 88 H20 Z","M25 36 Q20 3 50 8 Q80 3 75 36"],["Sac à dos vert sauge","#8c9c78","M18 34 Q18 22 32 22 H68 Q82 22 82 34 L86 91 H14 Z","M30 25 Q30 5 50 5 Q70 5 70 25"],["Pochette soirée noire","#292a2e","M10 48 Q10 38 20 38 H80 Q90 38 90 48 L86 82 H14 Z","M42 39 Q42 18 50 18 Q58 18 58 39"],["Sac seau caramel","#b87945","M18 39 Q18 31 28 31 H72 Q82 31 82 39 L76 91 H24 Z","M30 33 Q30 10 50 10 Q70 10 70 33"],["Mini sac rose poudré","#d99aa7","M23 48 Q23 38 32 38 H68 Q77 38 77 48 L74 82 H26 Z","M33 39 Q33 18 50 18 Q67 18 67 39"],["Sac hobo bleu nuit","#344a68","M8 45 Q20 25 38 36 Q58 50 92 37 L86 88 Q50 108 14 88 Z","M25 39 Q12 5 50 12 Q88 5 75 39"],["Sac rond paille","#c6a36a","M20 34 A30 30 0 1 0 80 34 A30 30 0 1 0 20 34","M34 29 Q34 3 50 3 Q66 3 66 29"],["Sac cartable bordeaux","#743e4d","M12 42 Q12 34 22 34 H78 Q88 34 88 42 L84 89 H16 Z","M32 36 V26 Q32 14 50 14 Q68 14 68 26 V36"],["Sac banane jaune moutarde","#d0a52c","M8 47 Q20 27 50 35 Q80 27 92 47 L84 78 Q50 94 16 78 Z","M12 46 Q50 4 88 46"],["Sac shopper bleu ciel","#83b5c8","M10 42 H90 L84 91 H16 Z","M28 42 V24 Q28 8 50 8 Q72 8 72 24 V42"],["Sac matelassé prune","#80516f","M14 42 Q14 33 24 33 H76 Q86 33 86 42 L82 89 H18 Z","M27 35 Q27 12 50 12 Q73 12 73 35"],["Sac baguette orange","#d17c42","M10 46 Q10 37 20 37 H80 Q90 37 90 46 L86 78 H14 Z","M28 39 Q28 17 50 17 Q72 17 72 39"],["Sac seau imprimé vert","#477b61","M18 40 L82 40 L75 91 H25 Z","M30 40 Q30 10 50 10 Q70 10 70 40"],["Sac à chaîne ivoire","#e0d6c4","M15 44 Q15 35 25 35 H75 Q85 35 85 44 L80 88 H20 Z","M26 36 Q26 6 50 6 Q74 6 74 36"],["Sac trapèze turquoise","#42a9a4","M25 32 H75 L91 90 H9 Z","M35 34 Q35 7 50 7 Q65 7 65 34"],["Sac bowling chocolat","#79513c","M12 45 Q12 34 24 34 H76 Q88 34 88 45 L82 86 H18 Z","M30 35 V25 Q30 13 50 13 Q70 13 70 25 V35"],["Sac pochette lilas","#a58bbf","M10 48 L50 35 L90 48 L84 83 H16 Z","M38 38 Q38 20 50 20 Q62 20 62 38"],["Sac porté épaule kaki","#7a8060","M12 43 Q12 35 22 35 H78 Q88 35 88 43 L83 90 H17 Z","M27 37 Q27 4 50 4 Q73 4 73 37"],["Sac mini coffre argenté","#a9adb6","M18 43 Q18 33 28 33 H72 Q82 33 82 43 L78 86 H22 Z","M34 35 V24 Q34 12 50 12 Q66 12 66 24 V35"]]
