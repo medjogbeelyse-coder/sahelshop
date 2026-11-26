@@ -17,6 +17,12 @@
       <a href="{{ url_for('admin_logout') }}" class="rounded-xl bg-red-700 px-4 py-3 text-sm font-bold hover:bg-red-600">Déconnexion</a>
     </header>
 
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+        <div class="mb-5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
     <section class="rounded-2xl border border-slate-800 bg-slate-900 p-5 md:p-7">
       <div class="mb-5">
         <h2 class="text-xl font-bold">Ajouter une offre</h2>
