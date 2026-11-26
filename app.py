@@ -216,21 +216,45 @@ def view_section(name):
                             "demo": False
                         })
 
-            # Illustrations de démonstration : 20 silhouettes et coloris réellement distincts.
-            if True:
-                import base64
-                import urllib.parse
-                bag_styles = [["Sac cabas structuré beige","#c9a77a","M8 43 Q8 35 18 35 H82 Q92 35 92 43 L88 91 H12 Z","M28 37 V25 Q28 8 50 8 Q72 8 72 25 V37"],["Sac bandoulière rouge","#b94743","M16 42 Q16 34 25 34 H75 Q84 34 84 42 L80 88 H20 Z","M25 36 Q20 3 50 8 Q80 3 75 36"],["Sac à dos vert sauge","#8c9c78","M18 34 Q18 22 32 22 H68 Q82 22 82 34 L86 91 H14 Z","M30 25 Q30 5 50 5 Q70 5 70 25"],["Pochette soirée noire","#292a2e","M10 48 Q10 38 20 38 H80 Q90 38 90 48 L86 82 H14 Z","M42 39 Q42 18 50 18 Q58 18 58 39"],["Sac seau caramel","#b87945","M18 39 Q18 31 28 31 H72 Q82 31 82 39 L76 91 H24 Z","M30 33 Q30 10 50 10 Q70 10 70 33"],["Mini sac rose poudré","#d99aa7","M23 48 Q23 38 32 38 H68 Q77 38 77 48 L74 82 H26 Z","M33 39 Q33 18 50 18 Q67 18 67 39"],["Sac hobo bleu nuit","#344a68","M8 45 Q20 25 38 36 Q58 50 92 37 L86 88 Q50 108 14 88 Z","M25 39 Q12 5 50 12 Q88 5 75 39"],["Sac rond paille","#c6a36a","M20 34 A30 30 0 1 0 80 34 A30 30 0 1 0 20 34","M34 29 Q34 3 50 3 Q66 3 66 29"],["Sac cartable bordeaux","#743e4d","M12 42 Q12 34 22 34 H78 Q88 34 88 42 L84 89 H16 Z","M32 36 V26 Q32 14 50 14 Q68 14 68 26 V36"],["Sac banane jaune moutarde","#d0a52c","M8 47 Q20 27 50 35 Q80 27 92 47 L84 78 Q50 94 16 78 Z","M12 46 Q50 4 88 46"],["Sac shopper bleu ciel","#83b5c8","M10 42 H90 L84 91 H16 Z","M28 42 V24 Q28 8 50 8 Q72 8 72 24 V42"],["Sac matelassé prune","#80516f","M14 42 Q14 33 24 33 H76 Q86 33 86 42 L82 89 H18 Z","M27 35 Q27 12 50 12 Q73 12 73 35"],["Sac baguette orange","#d17c42","M10 46 Q10 37 20 37 H80 Q90 37 90 46 L86 78 H14 Z","M28 39 Q28 17 50 17 Q72 17 72 39"],["Sac seau imprimé vert","#477b61","M18 40 L82 40 L75 91 H25 Z","M30 40 Q30 10 50 10 Q70 10 70 40"],["Sac à chaîne ivoire","#e0d6c4","M15 44 Q15 35 25 35 H75 Q85 35 85 44 L80 88 H20 Z","M26 36 Q26 6 50 6 Q74 6 74 36"],["Sac trapèze turquoise","#42a9a4","M25 32 H75 L91 90 H9 Z","M35 34 Q35 7 50 7 Q65 7 65 34"],["Sac bowling chocolat","#79513c","M12 45 Q12 34 24 34 H76 Q88 34 88 45 L82 86 H18 Z","M30 35 V25 Q30 13 50 13 Q70 13 70 25 V35"],["Sac pochette lilas","#a58bbf","M10 48 L50 35 L90 48 L84 83 H16 Z","M38 38 Q38 20 50 20 Q62 20 62 38"],["Sac porté épaule kaki","#7a8060","M12 43 Q12 35 22 35 H78 Q88 35 88 43 L83 90 H17 Z","M27 37 Q27 4 50 4 Q73 4 73 37"],["Sac mini coffre argenté","#a9adb6","M18 43 Q18 33 28 33 H72 Q82 33 82 43 L78 86 H22 Z","M34 35 V24 Q34 12 50 12 Q66 12 66 24 V35"]]
-                bag_ids = ["demo-19","demo-20","demo-21"] + [f"demo-{i:02d}" for i in range(28,45)]
-                by_id = {str(p["id"]): p for p in prods}
-                for idx, bag_id in enumerate(bag_ids):
-                    if bag_id not in by_id:
-                        continue
-                    title, color, body, handle = bag_styles[idx]
-                    detail = ["#f4dfb0","#e8c9c2","#d8e0cc","#b9b9c0","#f0d7b0"][idx % 5]
-                    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110"><defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#faf8f2"/><stop offset="1" stop-color="#e9e4da"/></linearGradient><linearGradient id="bag" x2="1" y2="1"><stop stop-color="{color}"/><stop offset="1" stop-color="{detail}"/></linearGradient></defs><rect width="100" height="110" rx="8" fill="url(#bg)"/><ellipse cx="50" cy="96" rx="34" ry="5" fill="#000" opacity=".10"/><path d="{handle}" fill="none" stroke="{color}" stroke-width="5" stroke-linecap="round"/><path d="{body}" fill="url(#bag)" stroke="#493d36" stroke-width="1.7" stroke-linejoin="round"/><path d="M23 54 Q50 60 77 54" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="2"/><circle cx="50" cy="57" r="3" fill="#d6b56e"/><path d="M31 76 H69" stroke="#ffffff" stroke-opacity=".35" stroke-width="1.5"/></svg>'''
-                    by_id[bag_id]["image"] = "data:image/svg+xml;base64," + base64.b64encode(svg.encode("utf-8")).decode("ascii")
-                    by_id[bag_id]["designation"] = title
+            # Photos réelles de sacs pour le catalogue de démonstration.
+            # Ces visuels ne représentent pas le stock réel de la boutique.
+            bag_photos = [
+                "https://images.unsplash.com/photo-1681747685985-a401c271156c?auto=format&fit=crop&w=900&q=85",
+                "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=85",
+                "https://imgv3.fotor.com/images/slider-image/a-white-bag-photo-denoised-and-de-grained-with-fotor-ai-image-denoiser.jpg",
+                "https://d1a66n3120ol3x.cloudfront.net/blog/20260531/6a2403547f684119a68e98f7184321b4.jpg",
+                "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/3313a1156011881.635fc1747a498.png",
+                "https://i.pinimg.com/originals/5a/1b/45/5a1b451c7baffbbc14e6db59ad02b0c1.jpg",
+                "https://img.ruanwenpu.com/Public/upfiles/108904/202602/20260228150157107158.jpg",
+                "https://tortoise.net.in/cdn/shop/files/2_251c84dd-3516-4dcd-b5c4-9fd80cd1b321.png?v=1779344435&width=1946",
+                "https://baginning.com/media/catalog/product/cache/17f7930b9630993becbd36a7c8a76b30/g/e/genuine_leather_flap_square_bag_over_the_shoulder_bags_7_.jpg",
+                "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=900&q=85",
+                "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=85",
+                "https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?auto=format&fit=crop&w=900&q=85",
+                "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=85",
+                "https://images.unsplash.com/photo-1681747685985-a401c271156c?auto=format&fit=crop&w=900&q=85",
+                "https://d1a66n3120ol3x.cloudfront.net/blog/20260531/6a2403547f684119a68e98f7184321b4.jpg",
+                "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/3313a1156011881.635fc1747a498.png",
+                "https://i.pinimg.com/originals/5a/1b/45/5a1b451c7baffbbc14e6db59ad02b0c1.jpg",
+                "https://img.ruanwenpu.com/Public/upfiles/108904/202602/20260228150157107158.jpg",
+                "https://tortoise.net.in/cdn/shop/files/2_251c84dd-3516-4dcd-b5c4-9fd80cd1b321.png?v=1779344435&width=1946",
+                "https://baginning.com/media/catalog/product/cache/17f7930b9630993becbd36a7c8a76b30/g/e/genuine_leather_flap_square_bag_over_the_shoulder_bags_7_.jpg"
+            ]
+            bag_ids = ["demo-19", "demo-20", "demo-21"] + [f"demo-{i:02d}" for i in range(28, 45)]
+            by_id = {str(p["id"]): p for p in prods}
+            bag_names = [
+                "Sac à main matelassé rose", "Sac à main rouge structuré", "Sac cabas beige",
+                "Sac à main marron élégant", "Sac à main corail", "Sac à main vert",
+                "Sac bandoulière chocolat", "Sac épaule camel", "Sac bandoulière marron",
+                "Sac à main beige", "Sac bandoulière noir", "Petit sac chic",
+                "Sac à main rouge", "Sac matelassé rose poudré", "Sac cabas caramel",
+                "Sac à main corail", "Sac à main vert émeraude", "Sac bandoulière brun",
+                "Sac épaule camel", "Sac de sortie marron"
+            ]
+            for idx, bag_id in enumerate(bag_ids):
+                if bag_id in by_id:
+                    by_id[bag_id]["image"] = bag_photos[idx]
+                    by_id[bag_id]["designation"] = bag_names[idx]
             return render_template("section.html", name=name, produits=prods)
             
     except Exception as e:
