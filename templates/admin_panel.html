@@ -1,10 +1,64 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Administration | SAHEL SHOP</title><script src="https://cdn.tailwindcss.com"></script></head>
-<body class="bg-slate-950 text-slate-100 min-h-screen"><main class="max-w-6xl mx-auto p-4 md:p-8">
-<header class="flex justify-between items-center gap-4 mb-8"><div><p class="text-amber-400 text-xs tracking-widest font-bold">SAHEL SHOP</p><h1 class="text-2xl md:text-3xl font-black">Administration</h1><p class="text-slate-400 text-sm mt-1">Gérez le catalogue et les offres publiées.</p></div><a href="{{ url_for('admin_logout') }}" class="bg-red-700 px-4 py-2 rounded-lg text-sm font-bold">Déconnexion</a></header>
-<section class="grid md:grid-cols-3 gap-3 mb-8">{% for key,val in flags.items() %}<form method="POST" class="bg-slate-900 border border-slate-800 rounded-xl p-4"><input type="hidden" name="flag_key" value="{{ key }}"><p class="text-xs text-slate-400 uppercase mb-3">{{ key }}</p><button class="w-full py-3 rounded-lg font-bold {{ 'bg-emerald-700' if val else 'bg-red-700' }}">{{ 'ACTIF' if val else 'DÉSACTIVÉ' }} · Modifier</button></form>{% endfor %}</section>
-<section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-8"><h2 class="font-bold text-xl mb-1">Ajouter un article</h2><p class="text-slate-400 text-xs mb-5">Publiez vos articles réels avec leur prix et leur photo. Aucun stock fictif n'est ajouté automatiquement.</p>
-<form method="POST" enctype="multipart/form-data" class="grid md:grid-cols-2 lg:grid-cols-5 gap-3"><input class="bg-slate-800 rounded-lg p-3" name="designation" placeholder="Nom de l'article" required><input class="bg-slate-800 rounded-lg p-3" name="price" type="number" min="0" step="1" placeholder="Prix en FCFA" required><select class="bg-slate-800 rounded-lg p-3" name="category"><option value="homme">Homme</option><option value="femme">Femme</option><option value="enfant">Enfant</option><option value="chaussures">Chaussures</option><option value="sacs">Sacs</option><option value="accessoires">Accessoires</option><option value="traditionnel">Tenues traditionnelles</option><option value="promotions">Promotions</option><option value="nouveautes">Nouveautés</option></select><input class="bg-slate-800 rounded-lg p-3 text-xs" type="file" name="image_file" accept="image/*"><button class="bg-amber-500 text-slate-950 rounded-lg p-3 font-black">Publier l'article</button></form></section>
-<section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-8"><h2 class="font-bold text-xl mb-4">Articles publiés ({{ produits|length }})</h2><div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="p-3">Article</th><th class="p-3">Catégorie</th><th class="p-3">Prix</th><th class="p-3">Action</th></tr></thead><tbody>{% for p in produits %}<tr class="border-b border-slate-800"><td class="p-3 font-semibold">{{ p.designation }}</td><td class="p-3">{{ p.section }}</td><td class="p-3">{{ "{:,.0f}".format(p.prix|float) }} F</td><td class="p-3"><form method="POST" onsubmit="return confirm('Supprimer cet article ?')"><input type="hidden" name="delete_id" value="{{ p.id }}"><button class="text-red-400 font-bold">Supprimer</button></form></td></tr>{% else %}<tr><td colspan="4" class="p-5 text-slate-400">Aucun article publié pour le moment.</td></tr>{% endfor %}</tbody></table></div></section>
-<section class="bg-slate-900 border border-slate-800 rounded-2xl p-5"><h2 class="font-bold text-xl mb-4">Offres de recrutement</h2><form method="POST" class="flex flex-col md:flex-row gap-3 mb-4"><input class="bg-slate-800 rounded-lg p-3 flex-1" name="titre_poste" placeholder="Intitulé du poste" required><button class="bg-violet-700 rounded-lg px-5 py-3 font-bold">Ajouter</button></form>{% for poste in postes %}<div class="flex justify-between border-b border-slate-800 py-3"><span>{{ poste.titre }}</span><form method="POST" onsubmit="return confirm('Supprimer ce poste ?')"><input type="hidden" name="delete_poste_id" value="{{ poste.id }}"><button class="text-red-400 text-xs font-bold">Supprimer</button></form></div>{% endfor %}</section>
-</main></body></html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Recrutement | Administration SAHEL SHOP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+  <main class="mx-auto max-w-4xl p-4 md:p-8">
+    <header class="mb-8 flex items-center justify-between gap-4">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.25em] text-amber-400">SAHEL SHOP</p>
+        <h1 class="mt-2 text-3xl font-black">Recrutement</h1>
+        <p class="mt-2 text-sm text-slate-400">Publiez et gérez les offres d'emploi du site.</p>
+      </div>
+      <a href="{{ url_for('admin_logout') }}" class="rounded-xl bg-red-700 px-4 py-3 text-sm font-bold hover:bg-red-600">Déconnexion</a>
+    </header>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900 p-5 md:p-7">
+      <div class="mb-5">
+        <h2 class="text-xl font-bold">Ajouter une offre</h2>
+        <p class="mt-1 text-sm text-slate-400">Le poste ajouté apparaîtra dans la liste des postes proposés aux candidats.</p>
+      </div>
+      <form method="POST" class="flex flex-col gap-3 sm:flex-row">
+        <input
+          class="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-800 px-4 py-4 text-white outline-none placeholder:text-slate-500 focus:border-amber-400"
+          name="titre_poste"
+          placeholder="Ex. : Commercial, Comptable, Développeur..."
+          maxlength="120"
+          required>
+        <button class="rounded-xl bg-amber-400 px-6 py-4 font-black text-slate-950 hover:bg-amber-300" type="submit">Publier l'offre</button>
+      </form>
+    </section>
+
+    <section class="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-5 md:p-7">
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <h2 class="text-xl font-bold">Offres publiées</h2>
+        <span class="rounded-full bg-slate-800 px-3 py-1 text-sm font-bold text-amber-300">{{ postes|length }}</span>
+      </div>
+      <div class="divide-y divide-slate-800">
+        {% for poste in postes %}
+          <div class="flex items-center justify-between gap-4 py-4">
+            <div class="flex min-w-0 items-center gap-3">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-amber-300">💼</span>
+              <span class="font-semibold">{{ poste.titre }}</span>
+            </div>
+            <form method="POST" onsubmit="return confirm('Supprimer cette offre ?')">
+              <input type="hidden" name="delete_poste_id" value="{{ poste.id }}">
+              <button class="rounded-lg px-3 py-2 text-sm font-bold text-red-400 hover:bg-red-950" type="submit">Supprimer</button>
+            </form>
+          </div>
+        {% else %}
+          <div class="py-10 text-center text-sm text-slate-400">
+            Aucune offre publiée pour le moment.
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <footer class="mt-8 text-center text-xs text-slate-600">Espace administrateur sécurisé · SAHEL SHOP</footer>
+  </main>
+</body>
+</html>
