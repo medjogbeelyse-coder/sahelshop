@@ -2,95 +2,107 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SAHEL SHOP | Prêt-à-porter</title>
+<title>SAHEL SHOP | Boutique mode</title>
+<meta name="description" content="Découvrez les sacs, chaussures et vêtements SAHEL SHOP. Mode accessible, commande simple et prix en FCFA.">
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#17231f;--green:#174b3b;--gold:#c89b4b;--cream:#f7f5ef}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif}.serif{font-family:'Playfair Display',serif}.wrap{max-width:1240px;margin:auto;padding:0 22px}.topline{background:var(--green);color:#fff;text-align:center;padding:9px 12px;font-size:11px;letter-spacing:.12em;text-transform:uppercase}.brand{font-weight:800;letter-spacing:.18em;font-size:20px}.gold{color:var(--gold)}.hero{background:linear-gradient(115deg,rgba(15,39,31,.94),rgba(23,75,59,.72)),radial-gradient(circle at 80% 20%,#9a7540,#173e32);color:white;border-radius:24px;padding:52px 38px;margin:26px 0}.chip{border:1px solid #dedbd1;border-radius:99px;padding:10px 17px;font-size:12px;font-weight:700;white-space:nowrap}.chip.active,.chip:hover{background:var(--green);color:white;border-color:var(--green)}.product{background:white;border:1px solid #e9e5dc;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-width:0}.product img{width:100%;height:220px;object-fit:cover;background:#eeece5}.product-info{padding:15px;display:flex;flex-direction:column;flex:1}.btn{background:var(--green);color:#fff;border-radius:10px;padding:11px 14px;font-weight:700;font-size:12px}.btn:hover{background:#0d3629}.muted{color:#777e78}.overlay{position:fixed;inset:0;background:#1119;z-index:30;display:none}.overlay.show{display:block}.panel{position:absolute;right:0;top:0;height:100%;width:min(440px,100%);background:white;padding:24px;overflow:auto}.field{width:100%;border:1px solid #ddd;border-radius:10px;padding:12px;margin-top:5px}.empty{border:1px dashed #d4d0c5;border-radius:16px;padding:30px;text-align:center;color:#777}.footer{background:#142d25;color:#e8e7de;margin-top:60px;padding:35px 0}
-@media(max-width:640px){.wrap{padding:0 15px}.hero{padding:35px 23px;margin:18px 0;border-radius:18px}.product img{height:165px}.product-info{padding:11px}.brand{font-size:17px}}
+:root{--ink:#202020;--muted:#777;--line:#ededed;--hot:#e60023;--soft:#f7f7f7}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--ink);font-family:'DM Sans',sans-serif}
+a{color:inherit;text-decoration:none}button,input,select{font:inherit}.promo{background:#202020;color:#fff;text-align:center;padding:9px 12px;font-size:11px;letter-spacing:.04em}
+.wrap{max-width:1320px;margin:auto;padding:0 24px}.brand{font-size:23px;font-weight:900;letter-spacing:.09em;white-space:nowrap}.brand span{color:var(--hot)}
+.header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}.headrow{height:76px;display:flex;align-items:center;gap:26px}.searchbox{height:42px;background:#f5f5f5;border-radius:4px;display:flex;align-items:center;flex:1;max-width:560px;padding:0 14px}.searchbox input{border:0;outline:0;background:transparent;width:100%;font-size:13px}.headlink{font-size:12px;font-weight:700;white-space:nowrap}.iconbtn{border:0;background:transparent;cursor:pointer;font-size:21px;position:relative;padding:8px}.count{position:absolute;right:0;top:0;background:var(--hot);color:#fff;border-radius:20px;font-size:9px;min-width:16px;height:16px;display:grid;place-items:center}
+.nav{display:flex;gap:27px;align-items:center;overflow:auto;white-space:nowrap;padding:13px 0 15px}.nav a{font-size:12px;font-weight:700}.nav a:hover,.nav a.hot{color:var(--hot)}
+.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:12px;margin:22px auto 28px}.hero-main{min-height:350px;background:linear-gradient(90deg,rgba(22,22,22,.82),rgba(22,22,22,.08)),url('https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1500&q=85') center/cover;border-radius:3px;color:#fff;display:flex;align-items:center;padding:48px}.hero-copy{max-width:430px}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}.hero h1{font-size:clamp(34px,5vw,62px);line-height:1.02;font-weight:900;margin:16px 0}.hero p{font-size:14px;line-height:1.7;color:#f3f3f3}.hero-cta{display:inline-block;background:#fff;color:#202020;padding:14px 22px;margin-top:14px;font-size:11px;font-weight:900;letter-spacing:.06em;border-radius:2px}.hero-side{display:grid;grid-template-rows:1fr 1fr;gap:12px}.side-tile{position:relative;min-height:169px;padding:24px;color:#fff;display:flex;flex-direction:column;justify-content:end;background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,.05)),linear-gradient(135deg,#a26c5b,#e5c7b1)}.side-tile:nth-child(2){background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,.05)),linear-gradient(135deg,#3b4b4b,#a4b2a4)}.side-tile b{font-size:21px}.side-tile span{font-size:10px;letter-spacing:.1em;margin-top:6px}
+.section-title{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:38px 0 18px}.section-title h2{font-size:23px;font-weight:900;letter-spacing:-.04em;margin:0}.section-title p{color:var(--muted);font-size:12px;margin:6px 0 0}.more{font-size:11px;font-weight:800;color:var(--hot);white-space:nowrap}
+.category-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:24px 0 34px}.cat-tile{background:#f6f6f6;min-height:92px;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;font-size:12px;font-weight:800;border-radius:3px;transition:.18s}.cat-tile:hover{background:#ededed;transform:translateY(-2px)}
+.bag-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 14px}.product{min-width:0;position:relative;background:#fff}.product-photo{position:relative;background:#f5f5f5;aspect-ratio:3/4;overflow:hidden}.product-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}.product:hover .product-photo img{transform:scale(1.035)}.product-info{padding:10px 2px 2px}.product-name{font-size:12px;line-height:1.45;min-height:34px;font-weight:500}.product-price{font-size:14px;font-weight:900;margin-top:7px}.product-label{font-size:9px;color:var(--hot);font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.heart{position:absolute;right:9px;top:9px;border:0;background:#fff;border-radius:50%;width:31px;height:31px;cursor:pointer;font-size:16px}.add{width:100%;border:0;background:#202020;color:#fff;padding:11px 8px;margin-top:9px;font-size:10px;font-weight:900;letter-spacing:.05em;cursor:pointer}.add:hover{background:var(--hot)}
+.filters{display:flex;gap:8px;overflow:auto;padding:3px 0 14px;scrollbar-width:thin}.chip{border:1px solid #ddd;background:white;border-radius:2px;padding:10px 14px;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer}.chip.active,.chip:hover{background:#202020;color:#fff;border-color:#202020}
+.catalog-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 15px}.catalog-tools p{font-size:11px;color:var(--muted)}.sort{border:1px solid #ddd;background:#fff;padding:10px;font-size:11px}
+.banner-strip{background:#f5f2ed;margin:42px 0;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:20px}.banner-strip h3{font-size:24px;font-weight:900;margin:0}.banner-strip p{font-size:12px;color:#666;margin:7px 0 0}.banner-strip a{background:#202020;color:white;padding:13px 18px;font-size:10px;font-weight:900;white-space:nowrap}
+.empty{border:1px dashed #ddd;padding:35px;text-align:center;color:#777;grid-column:1/-1;font-size:13px}
+.footer{background:#202020;color:#fff;margin-top:55px;padding:40px 0}.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px}.footer h4{font-size:12px;margin:0 0 13px}.footer p,.footer a{font-size:11px;color:#bbb;line-height:2}
+.overlay{position:fixed;inset:0;background:#0008;z-index:50;display:none}.overlay.show{display:block}.panel{position:absolute;right:0;top:0;height:100%;width:min(440px,100%);background:#fff;padding:24px;overflow:auto}.field{width:100%;border:1px solid #ddd;padding:12px;margin-top:5px;font-size:13px}.checkout-btn{width:100%;background:var(--hot);color:white;border:0;padding:14px;font-size:12px;font-weight:900;cursor:pointer}
+.mobile-bottom{display:none}
+@media(max-width:900px){.product-grid,.bag-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{grid-template-columns:1fr}.hero-side{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.side-tile{min-height:130px}.category-strip{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.wrap{padding:0 13px}.promo{font-size:9px}.headrow{height:61px;gap:9px}.brand{font-size:18px}.searchbox{order:3;position:absolute;top:61px;left:13px;right:13px;max-width:none;height:37px}.header{padding-bottom:43px}.headlink{display:none}.nav{gap:19px;padding:10px 0}.nav a{font-size:11px}.hero{margin:14px auto 20px;gap:8px}.hero-main{min-height:300px;padding:25px 20px;background-position:58% center}.hero h1{font-size:39px}.hero p{font-size:12px}.hero-cta{padding:12px 15px}.side-tile{min-height:112px;padding:14px}.side-tile b{font-size:16px}.side-tile span{font-size:8px}.category-strip{gap:7px;margin:18px 0 27px}.cat-tile{min-height:72px;font-size:10px;padding:9px}.section-title{margin:29px 0 14px}.section-title h2{font-size:20px}.section-title p{font-size:10px}.bag-grid,.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 10px}.product-name{font-size:11px}.product-price{font-size:13px}.add{padding:10px 5px}.banner-strip{padding:20px 15px;margin:30px 0;align-items:flex-start;flex-direction:column}.banner-strip h3{font-size:20px}.footer-grid{grid-template-columns:1fr 1fr}.footer-grid>div:first-child{grid-column:1/-1}.mobile-bottom{display:flex;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #ddd;z-index:25;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom));}.mobile-bottom a,.mobile-bottom button{font-size:9px;color:#444;text-align:center;background:none;border:0;display:flex;flex-direction:column;gap:3px;align-items:center}.mobile-bottom strong{font-size:18px;font-weight:500}.footer{padding-bottom:75px}}
 </style>
 </head>
 <body>
-<div class="topline">SAHEL SHOP · La mode, au rythme de vos envies</div>
-<header class="wrap flex items-center justify-between py-5">
-<a class="brand" href="/"><span class="gold">SAHEL</span> SHOP</a>
-<nav class="hidden md:flex gap-7 text-sm font-semibold"><a href="/accueil">Accueil</a><a href="#catalogue">Boutique</a><a href="/section/investissement">Investissement</a><a href="/section/recrutement">Recrutement</a></nav>
-<button class="btn" onclick="openCart()">Panier <span id="cartCount">0</span></button>
+<div class="promo">BIENVENUE CHEZ SAHEL SHOP · LA MODE ACCESSIBLE EN FCFA · NOUVELLES COLLECTIONS</div>
+<header class="header">
+ <div class="wrap">
+  <div class="headrow">
+   <a class="brand" href="/"><span>SAHEL</span> SHOP</a>
+   <label class="searchbox"><span style="font-size:17px;margin-right:9px">⌕</span><input id="search" placeholder="Rechercher un sac, une chaussure, un vêtement…" oninput="renderProducts()"></label>
+   <a class="headlink" href="/accueil">Mon espace</a>
+   <button class="iconbtn" onclick="openCart()" aria-label="Ouvrir le panier">♧<span id="cartCount" class="count">0</span></button>
+  </div>
+  <nav class="nav">
+   <a class="hot" href="#sacs">SACS FEMME</a><a href="#catalogue" onclick="setCategory('chaussures_homme')">CHAUSSURES HOMME</a><a href="#catalogue" onclick="setCategory('chaussures_bebe')">BÉBÉ</a><a href="#catalogue" onclick="setCategory('chaussures_femme')">CHAUSSURES FEMME</a><a href="#catalogue" onclick="setCategory('homme')">HOMME</a><a href="#catalogue" onclick="setCategory('femme')">FEMME</a><a href="#catalogue" onclick="setCategory('enfant')">ENFANT</a><a href="#catalogue" onclick="setCategory('traditionnel')">TRADITIONNEL</a>
+  </nav>
+ </div>
 </header>
 <main class="wrap">
-<section class="hero">
-<p class="text-xs tracking-[.25em] uppercase text-amber-200 font-bold mb-4">Collection prêt-à-porter</p>
-<h1 class="serif text-4xl md:text-6xl leading-tight max-w-2xl">Votre style. Votre identité. Votre Sahel.</h1>
-<p class="text-sm md:text-base text-white/80 mt-5 max-w-xl">Découvrez nos vêtements, chaussures, sacs et accessoires. Choisissez vos articles et envoyez votre commande en quelques instants.</p>
-<a href="#catalogue" class="inline-block mt-7 bg-white text-emerald-950 rounded-xl px-5 py-3 text-xs font-extrabold">DÉCOUVRIR LA COLLECTION</a>
-</section>
-<section class="mb-10 mt-2">
-<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-4">
-<div><p class="gold text-xs tracking-[.2em] font-bold uppercase">À l’honneur</p><h2 class="serif text-3xl mt-1">Sacs femme en vedette & mode femme</h2><p class="muted text-sm mt-2">Robes, ensembles et une belle sélection de sacs à main à petits prix.</p></div>
-<button class="chip self-start" onclick="setCategory('sacs',document.querySelector('[data-cat=sacs]'))">Voir tous les sacs →</button>
-</div>
-<div id="womenHighlights" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5"></div>
-</section>
-<section id="catalogue" class="py-5">
-<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
-<div><p class="gold text-xs tracking-[.2em] font-bold uppercase">La sélection</p><h2 class="serif text-3xl mt-1">La boutique</h2><p class="muted text-sm mt-2">Catalogue de présentation : prix et disponibilités des modèles de démonstration à confirmer auprès de la boutique.</p></div>
-<input id="search" class="field md:max-w-xs" style="margin:0" placeholder="Rechercher un article…" oninput="renderProducts()">
-</div>
-<div id="categories" class="flex gap-2 overflow-x-auto pb-4 mb-3">
-<button class="chip active" data-cat="all" onclick="setCategory('all',this)">Tout voir</button>
-<button class="chip" data-cat="sacs" onclick="setCategory('sacs',this)">Sacs femme</button>
-<button class="chip" data-cat="chaussures_homme" onclick="setCategory('chaussures_homme',this)">Chaussures homme en cuir ciré</button>
-<button class="chip" data-cat="chaussures_bebe" onclick="setCategory('chaussures_bebe',this)">Chaussures bébé</button>
-<button class="chip" data-cat="chaussures_femme" onclick="setCategory('chaussures_femme',this)">Chaussures femme</button>
-<button class="chip" data-cat="homme" onclick="setCategory('homme',this)">Vêtements homme</button>
-<button class="chip" data-cat="femme" onclick="setCategory('femme',this)">Vêtements femme</button>
-<button class="chip" data-cat="enfant" onclick="setCategory('enfant',this)">Vêtements enfant</button>
-<button class="chip" data-cat="accessoires" onclick="setCategory('accessoires',this)">Accessoires</button>
-<button class="chip" data-cat="traditionnel" onclick="setCategory('traditionnel',this)">Traditionnel</button>
-<button class="chip" data-cat="promotions" onclick="setCategory('promotions',this)">Promotions</button>
-<button class="chip" data-cat="nouveautes" onclick="setCategory('nouveautes',this)">Nouveautés</button>
-</div>
-<div class="flex items-center justify-between mb-4"><p id="resultCount" class="muted text-xs"></p><select id="sort" class="field max-w-[175px]" style="margin:0" onchange="renderProducts()"><option value="recent">Plus récents</option><option value="priceUp">Prix croissant</option><option value="priceDown">Prix décroissant</option></select></div>
-<div id="productGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5"></div>
-</section>
+ <section class="hero">
+  <div class="hero-main"><div class="hero-copy"><div class="eyebrow">La nouvelle collection</div><h1>Votre style.<br>Vos envies.</h1><p>Des sacs aux chaussures, des essentiels du quotidien aux tenues qui font la différence. Trouvez votre prochain coup de cœur.</p><a href="#catalogue" class="hero-cta">DÉCOUVRIR LA BOUTIQUE</a></div></div>
+  <div class="hero-side"><a class="side-tile" href="#sacs"><b>Les sacs femme</b><span>À DÉCOUVRIR →</span></a><a class="side-tile" href="#catalogue" onclick="setCategory('chaussures_homme')"><b>Élégance au masculin</b><span>CHAUSSURES EN CUIR CIRÉ →</span></a></div>
+ </section>
+ <div class="category-strip">
+  <a class="cat-tile" href="#sacs">Sacs femme</a><a class="cat-tile" href="#catalogue" onclick="setCategory('chaussures_homme')">Chaussures homme</a><a class="cat-tile" href="#catalogue" onclick="setCategory('chaussures_bebe')">Chaussures bébé</a><a class="cat-tile" href="#catalogue" onclick="setCategory('chaussures_femme')">Chaussures femme</a><a class="cat-tile" href="#catalogue" onclick="setCategory('homme')">Mode homme</a><a class="cat-tile" href="#catalogue" onclick="setCategory('femme')">Mode femme</a>
+ </div>
+ <section id="sacs">
+  <div class="section-title"><div><h2>Les sacs femme à découvrir</h2><p>Une sélection de formes et de styles variés.</p></div><a class="more" href="#catalogue" onclick="setCategory('sacs')">VOIR LES 20 MODÈLES →</a></div>
+  <div id="womenHighlights" class="bag-grid"></div>
+ </section>
+ <section class="banner-strip"><div><h3>Un style pour chaque occasion</h3><p>Explorez les chaussures et les vêtements pour toute la famille.</p></div><a href="#catalogue">EXPLORER LES COLLECTIONS</a></section>
+ <section id="catalogue">
+  <div class="section-title"><div><h2>Tout le catalogue</h2><p>Les sacs, les chaussures, puis les vêtements et accessoires.</p></div></div>
+  <div class="filters" id="categories">
+   <button class="chip active" data-cat="all" onclick="setCategory('all',this)">Tout voir</button>
+   <button class="chip" data-cat="sacs" onclick="setCategory('sacs',this)">Sacs femme</button>
+   <button class="chip" data-cat="chaussures_homme" onclick="setCategory('chaussures_homme',this)">Chaussures homme en cuir ciré</button>
+   <button class="chip" data-cat="chaussures_bebe" onclick="setCategory('chaussures_bebe',this)">Chaussures bébé</button>
+   <button class="chip" data-cat="chaussures_femme" onclick="setCategory('chaussures_femme',this)">Chaussures femme</button>
+   <button class="chip" data-cat="homme" onclick="setCategory('homme',this)">Vêtements homme</button>
+   <button class="chip" data-cat="femme" onclick="setCategory('femme',this)">Vêtements femme</button>
+   <button class="chip" data-cat="enfant" onclick="setCategory('enfant',this)">Vêtements enfant</button>
+   <button class="chip" data-cat="traditionnel" onclick="setCategory('traditionnel',this)">Traditionnel</button>
+   <button class="chip" data-cat="accessoires" onclick="setCategory('accessoires',this)">Accessoires</button>
+  </div>
+  <div class="catalog-tools"><p id="resultCount">Chargement des articles…</p><select id="sort" class="sort" onchange="renderProducts()"><option value="recent">Ordre conseillé</option><option value="priceUp">Prix croissant</option><option value="priceDown">Prix décroissant</option></select></div>
+  <div id="productGrid" class="product-grid"></div>
+ </section>
 </main>
-<footer class="footer"><div class="wrap flex flex-col md:flex-row justify-between gap-5"><div><div class="brand"><span class="gold">SAHEL</span> SHOP</div><p class="text-xs text-white/60 mt-2">La mode accessible, avec une identité affirmée.</p></div><div class="text-xs text-white/70 leading-7"><a href="/accueil">Accueil</a><br><a href="/section/investissement">Investissement</a><br><a href="/section/recrutement">Recrutement</a></div><p class="text-xs text-white/50">© SAHEL SHOP</p></div></footer>
-<div id="cartOverlay" class="overlay" onclick="if(event.target===this)closeCart()"><aside class="panel"><div class="flex justify-between items-center"><h2 class="serif text-2xl">Votre panier</h2><button onclick="closeCart()" class="text-sm font-bold">Fermer ✕</button></div><div id="cartLines" class="my-6 space-y-4"></div><div class="border-t pt-4"><div class="flex justify-between font-bold mb-4"><span>Total</span><span id="cartTotal">0 F CFA</span></div><button class="btn w-full" onclick="openCheckout()">Passer commande</button></div></aside></div>
-<div id="checkoutOverlay" class="overlay" onclick="if(event.target===this)closeCheckout()"><section class="panel"><div class="flex justify-between items-center"><h2 class="serif text-2xl">Finaliser la commande</h2><button onclick="closeCheckout()">✕</button></div><form id="orderForm" class="space-y-3 mt-6">
+<footer class="footer"><div class="wrap footer-grid"><div><div class="brand"><span>SAHEL</span> SHOP</div><p>La mode accessible, avec une sélection de sacs, chaussures et vêtements.</p></div><div><h4>LA BOUTIQUE</h4><p><a href="#sacs">Sacs femme</a><br><a href="#catalogue">Chaussures</a><br><a href="#catalogue">Vêtements</a></p></div><div><h4>SAHEL SHOP</h4><p><a href="/accueil">Mon espace</a><br><a href="/section/investissement">Investissement</a><br><a href="/section/recrutement">Recrutement</a></p></div></div></footer>
+<nav class="mobile-bottom"><a href="/"><strong>⌂</strong>Accueil</a><a href="#catalogue"><strong>⌕</strong>Recherche</a><a href="#sacs"><strong>♡</strong>Sacs</a><button onclick="openCart()"><strong>♧</strong>Panier</button></nav>
+<div id="cartOverlay" class="overlay" onclick="if(event.target===this)closeCart()"><aside class="panel"><div class="flex justify-between items-center"><h2 class="text-xl font-black">MON PANIER</h2><button onclick="closeCart()">FERMER ✕</button></div><div id="cartLines" class="my-6 space-y-4"></div><div class="border-t pt-4"><div class="flex justify-between font-black mb-4"><span>Total</span><span id="cartTotal">0 F CFA</span></div><button class="checkout-btn" onclick="openCheckout()">PASSER COMMANDE</button></div></aside></div>
+<div id="checkoutOverlay" class="overlay" onclick="if(event.target===this)closeCheckout()"><section class="panel"><div class="flex justify-between items-center"><h2 class="text-xl font-black">FINALISER LA COMMANDE</h2><button onclick="closeCheckout()">✕</button></div><form id="orderForm" class="space-y-3 mt-6">
 <label class="block text-xs font-bold">Nom complet<input class="field" name="nom" required></label>
-<label class="block text-xs font-bold">Pays<input class="field" name="pays" required></label>
+<label class="block text-xs font-bold">Pays<input class="field" name="pays" value="Niger" required></label>
 <label class="block text-xs font-bold">Ville<input class="field" name="ville" required></label>
 <label class="block text-xs font-bold">Téléphone<input class="field" name="telephone" required></label>
 <label class="block text-xs font-bold">E-mail (facultatif)<input class="field" name="email" type="email"></label>
-<p id="orderMessage" class="text-xs"></p><button class="btn w-full" type="submit">Envoyer ma commande</button>
+<p id="orderMessage" class="text-xs"></p><button class="checkout-btn" type="submit">ENVOYER MA COMMANDE</button>
 </form></section></div>
 <script>
 const products = {{ produits|tojson }};
-const labels={homme:"Homme",femme:"Femme",enfant:"Enfant",chaussures:"Chaussures",chaussures_homme:"Chaussures homme",chaussures_bebe:"Chaussures bébé",chaussures_femme:"Chaussures femme",sacs:"Sacs",accessoires:"Accessoires",traditionnel:"Tenues traditionnelles",promotions:"Promotions",nouveautes:"Nouveautés",commerce_gem:"Homme",commerce_marche:"Femme"};
+const labels={homme:"Vêtements homme",femme:"Vêtements femme",enfant:"Vêtements enfant",chaussures:"Chaussures",chaussures_homme:"Chaussures homme",chaussures_bebe:"Chaussures bébé",chaussures_femme:"Chaussures femme",sacs:"Sacs femme",accessoires:"Accessoires",traditionnel:"Traditionnel",commerce_gem:"Homme",commerce_marche:"Femme"};
 let category="all",cart=JSON.parse(localStorage.getItem("sahel_cart")||"[]");
 const money=n=>new Intl.NumberFormat("fr-FR").format(Number(n)||0)+" F CFA";
-function setCategory(c,b){category=c;document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderProducts()}
-function renderWomenHighlights(){
- const picks=products.filter(p=>p.section==="femme"||p.section==="sacs").sort((a,b)=>(a.section==="sacs"?0:1)-(b.section==="sacs"?0:1)).slice(0,12);
- const target=document.getElementById("womenHighlights");
- if(!target)return;
- target.innerHTML=picks.map(p=>'<article class="product"><img src="'+(p.image||"")+'" alt="'+esc(p.designation)+'" loading="lazy" onerror="this.style.display=\'none\'"><div class="product-info"><p class="gold text-[10px] uppercase tracking-wider font-bold">'+(p.section==="sacs"?"Sacs femme":"Mode femme")+'</p><h3 class="font-bold text-sm mt-1">'+esc(p.designation)+'</h3><p class="font-extrabold mt-3 mb-4">'+money(p.prix)+'</p><button class="btn mt-auto" onclick="addToCart('+JSON.stringify(String(p.id))+')">Ajouter au panier</button></div></article>').join("");
-}
-
-function renderProducts(){
- let q=document.getElementById("search").value.toLowerCase(),sort=document.getElementById("sort").value;
- let list=products.filter(p=>(category==="all"||p.section===category||(category==="homme"&&p.section==="commerce_gem")||(category==="femme"&&p.section==="commerce_marche"))&&((p.designation||"").toLowerCase().includes(q)));
- if(sort==="recent"){const order={sacs:0,chaussures_homme:1,chaussures_bebe:2,chaussures_femme:3,homme:4,femme:5,enfant:6,traditionnel:7,chaussures:8,accessoires:9};list.sort((a,b)=>(order[a.section]??10)-(order[b.section]??10));}if(sort==="priceUp")list.sort((a,b)=>a.prix-b.prix);if(sort==="priceDown")list.sort((a,b)=>b.prix-a.prix);
- document.getElementById("resultCount").textContent=list.length+" article(s)";
- document.getElementById("productGrid").innerHTML=list.length?list.map(p=>'<article class="product"><img src="'+(p.image||"")+'" alt="" onerror="this.style.display=\'none\'"><div class="product-info"><p class="gold text-[10px] uppercase tracking-wider font-bold">'+(labels[p.section]||"Collection")+'</p><h3 class="font-bold text-sm mt-1">'+esc(p.designation)+'</h3><p class="font-extrabold mt-3 mb-4">'+money(p.prix)+'</p><button class="btn mt-auto" onclick="addToCart('+JSON.stringify(String(p.id))+')">Ajouter au panier</button></div></article>').join(""):'<div class="empty col-span-full"><p class="font-bold mb-2">Aucun article dans cette catégorie pour le moment.</p><p class="text-xs">Les nouveaux articles seront affichés dès leur publication par la boutique.</p></div>';
-}
+function setCategory(c,b){category=c;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x.dataset.cat===c));renderProducts();if(location.hash!=="#catalogue")document.getElementById("catalogue").scrollIntoView({behavior:"smooth"});}
 function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function productCard(p){return '<article class="product"><div class="product-photo"><img src="'+esc(p.image||"")+'" alt="'+esc(p.designation)+'" loading="lazy" onerror="this.style.display=\'none\'"><button class="heart" type="button" aria-label="Ajouter aux favoris" onclick="toggleFavorite(this)">♡</button></div><div class="product-info"><div class="product-label">'+(labels[p.section]||"Collection")+'</div><div class="product-name">'+esc(p.designation)+'</div><div class="product-price">'+money(p.prix)+'</div><button class="add" onclick="addToCart('+JSON.stringify(String(p.id))+')">AJOUTER AU PANIER</button></div></article>'}
+function renderWomenHighlights(){const picks=products.filter(p=>p.section==="sacs").slice(0,8);const target=document.getElementById("womenHighlights");target.innerHTML=picks.length?picks.map(productCard).join(""):'<div class="empty">Les sacs seront affichés dès leur publication.</div>'}
+function renderProducts(){const q=(document.getElementById("search").value||"").toLowerCase(),sort=document.getElementById("sort").value;let list=products.filter(p=>(category==="all"||p.section===category||(category==="homme"&&p.section==="commerce_gem")||(category==="femme"&&p.section==="commerce_marche"))&&((p.designation||"").toLowerCase().includes(q)));if(sort==="recent"){const order={sacs:0,chaussures_homme:1,chaussures_bebe:2,chaussures_femme:3,homme:4,femme:5,enfant:6,traditionnel:7,chaussures:8,accessoires:9};list.sort((a,b)=>(order[a.section]??10)-(order[b.section]??10))}if(sort==="priceUp")list.sort((a,b)=>Number(a.prix)-Number(b.prix));if(sort==="priceDown")list.sort((a,b)=>Number(b.prix)-Number(a.prix));document.getElementById("resultCount").textContent=list.length+" article(s)";document.getElementById("productGrid").innerHTML=list.length?list.map(productCard).join(""):'<div class="empty">Aucun article trouvé dans cette catégorie.</div>'}
+function toggleFavorite(btn){btn.textContent=btn.textContent==="♡"?"♥":"♡";btn.style.color=btn.textContent==="♥"?"#e60023":"#202020"}
 function persist(){localStorage.setItem("sahel_cart",JSON.stringify(cart));updateCart()}
-function addToCart(id){let p=products.find(x=>String(x.id)===String(id));if(!p)return;let line=cart.find(x=>String(x.id)===String(id));if(line)line.quantity++;else cart.push({id:p.id,name:p.designation,price:Number(p.prix),quantity:1});persist()}
-function updateCart(){document.getElementById("cartCount").textContent=cart.reduce((n,x)=>n+x.quantity,0);document.getElementById("cartLines").innerHTML=cart.length?cart.map((x,i)=>'<div class="flex justify-between gap-3 border-b pb-3"><div><p class="font-bold text-sm">'+esc(x.name)+'</p><p class="muted text-xs">'+money(x.price)+'</p><div class="flex gap-3 mt-2 text-sm"><button onclick="changeQty('+i+',-1)">−</button><b>'+x.quantity+'</b><button onclick="changeQty('+i+',1)">+</button></div></div><button class="text-red-600 text-xs" onclick="removeLine('+i+')">Retirer</button></div>').join(""):'<p class="empty">Votre panier est vide.</p>';document.getElementById("cartTotal").textContent=money(cart.reduce((n,x)=>n+x.price*x.quantity,0))}
+function addToCart(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;const line=cart.find(x=>String(x.id)===String(id));if(line)line.quantity++;else cart.push({id:p.id,name:p.designation,price:Number(p.prix),quantity:1});persist();document.getElementById("cartOverlay").classList.add("show")}
+function updateCart(){document.getElementById("cartCount").textContent=cart.reduce((n,x)=>n+x.quantity,0);document.getElementById("cartLines").innerHTML=cart.length?cart.map((x,i)=>'<div class="flex justify-between gap-3 border-b pb-3"><div><p class="font-bold text-sm">'+esc(x.name)+'</p><p class="text-xs text-gray-500">'+money(x.price)+'</p><div class="flex gap-3 mt-2 text-sm"><button onclick="changeQty('+i+',-1)">−</button><b>'+x.quantity+'</b><button onclick="changeQty('+i+',1)">+</button></div></div><button class="text-red-600 text-xs" onclick="removeLine('+i+')">Retirer</button></div>').join(""):'<p class="empty">Votre panier est vide.</p>';document.getElementById("cartTotal").textContent=money(cart.reduce((n,x)=>n+x.price*x.quantity,0))}
 function changeQty(i,n){cart[i].quantity+=n;if(cart[i].quantity<=0)cart.splice(i,1);persist()}function removeLine(i){cart.splice(i,1);persist()}
 function openCart(){document.getElementById("cartOverlay").classList.add("show")}function closeCart(){document.getElementById("cartOverlay").classList.remove("show")}function openCheckout(){if(!cart.length)return;closeCart();document.getElementById("checkoutOverlay").classList.add("show")}function closeCheckout(){document.getElementById("checkoutOverlay").classList.remove("show")}
-document.getElementById("orderForm").addEventListener("submit",async e=>{e.preventDefault();let f=new FormData(e.target),data=Object.fromEntries(f.entries());data.panier=cart.map(x=>({name:x.name,price:x.price,quantity:x.quantity}));let msg=document.getElementById("orderMessage");msg.textContent="Envoi de votre commande…";try{let r=await fetch("/passer-commande",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});let j=await r.json();if(!r.ok||!j.success)throw Error();msg.textContent="Commande transmise. Merci pour votre confiance.";cart=[];persist();e.target.reset()}catch(err){msg.textContent="L'envoi a échoué. Vérifiez votre connexion ou réessayez."}});
+document.getElementById("orderForm").addEventListener("submit",async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.target).entries());data.panier=cart.map(x=>({name:x.name,price:x.price,quantity:x.quantity}));const msg=document.getElementById("orderMessage");msg.textContent="Envoi de votre commande…";try{const r=await fetch("/passer-commande",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});const j=await r.json();if(!r.ok||!j.success)throw Error();msg.textContent="Commande transmise. Merci pour votre confiance.";cart=[];persist();e.target.reset()}catch(err){msg.textContent="L'envoi a échoué. Vérifiez votre connexion ou réessayez."}});
 renderWomenHighlights();renderProducts();updateCart();
 </script>
 </body></html>
