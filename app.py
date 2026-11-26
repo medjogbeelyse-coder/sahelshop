@@ -771,10 +771,14 @@ def passer_commande():
                     produit = produits_officiels[product_id]
                     name = str(produit.get("designation", "")).strip()[:160]
                     price = int(float(produit.get("prix", 0)))
+                    image_url = str(produit.get("image", "")).strip()
+                    category = str(produit.get("section", "")).strip()
                 elif product_id in DEMO_CATALOG:
                     produit = DEMO_CATALOG[product_id]
                     name = str(produit["name"])[:160]
                     price = int(produit["price"])
+                    image_url = str(item.get("image", "")).strip()
+                    category = str(produit.get("section", "")).strip()
                 else:
                     return jsonify({"success": False, "message": "Article indisponible. Actualisez le catalogue."}), 400
             except (TypeError, ValueError, KeyError, AttributeError):
@@ -785,7 +789,9 @@ def passer_commande():
 
             subtotal = price * quantity
             total += subtotal
-            items.append({"id": product_id, "name": name, "price": price, "quantity": quantity, "subtotal": subtotal})
+            if not image_url.startswith("https://"):
+                image_url = ""
+            items.append({"id": product_id, "name": name, "price": price, "quantity": quantity, "subtotal": subtotal, "image": image_url, "section": category})
 
         order = {
             "order_id": order_id, "status": "À confirmer", "notification_sent": False,
@@ -803,7 +809,10 @@ def passer_commande():
 
     safe = lambda value: html.escape(str(value))
     item_lines = "\n".join([
-        "• <b>" + safe(x["name"]) + "</b> (x" + str(x["quantity"]) + ") — " + format(x["subtotal"], ",") + " F"
+        "• <b>" + safe(x["name"]) + "</b>\\n"
+        + "   Référence : <code>" + safe(x["id"]) + "</code> | Catégorie : " + safe(x.get("section") or "Non précisée") + "\\n"
+        + "   Quantité : " + str(x["quantity"]) + " × " + format(x["price"], ",") + " F = <b>" + format(x["subtotal"], ",") + " F</b>"
+        + ("\\n   📷 <a href=\"" + safe(x["image"]) + "\">Voir la photo de cet article</a>" if x.get("image") else "\\n   📷 Photo non disponible")
         for x in order["items"]
     ])
     message = (
