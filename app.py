@@ -885,6 +885,39 @@ def envoyer_telegram(texte, mode="HTML"):
         response.status_code = 502
         return response
 
+# --- TEST TECHNIQUE TEMPORAIRE TELEGRAM (clé secrète requise) ---
+@app.route("/api/telegram-test", methods=["GET"])
+def tester_telegram():
+    expected = (os.getenv("SAHEL_TELEGRAM_TEST_KEY") or "").strip()
+    supplied = (request.args.get("key") or "").strip()
+    if not expected or not supplied or supplied != expected:
+        return jsonify({"success": False, "message": "Accès refusé."}), 403
+
+    test_value = {"status": "ok", "source": "sahelshop_telegram_test"}
+    storage_ok = kv.set("health:sahelshop_telegram_test", test_value)
+    stored_value = kv.get("health:sahelshop_telegram_test") if storage_ok else None
+    storage_verified = stored_value == test_value
+    if not storage_verified:
+        return jsonify({
+            "success": False,
+            "storage_ok": storage_ok,
+            "storage_verified": False,
+            "telegram_sent": False,
+            "message": "Le stockage KV ne confirme pas l'enregistrement. Consultez les journaux Vercel."
+        }), 503
+
+    result = envoyer_telegram(
+        "✅ TEST TECHNIQUE SAHEL SHOP\nLe stockage des commandes et la connexion Telegram sont en cours de vérification."
+    )
+    payload = result.get_json(silent=True) or {}
+    return jsonify({
+        "success": bool(payload.get("success")),
+        "storage_verified": True,
+        "telegram_sent": bool(payload.get("success")),
+        "message": "Message de test envoyé." if payload.get("success") else payload.get("message", "Échec Telegram.")
+    }), result.status_code
+
+
 # --- PANNEAU D'ADMINISTRATION (/MEDJOGBE11) ---
 
 @app.route("/MEDJOGBE11", methods=["GET", "POST"])
