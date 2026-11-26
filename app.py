@@ -145,7 +145,15 @@ def view_section(name):
                     {"id":"demo-33","designation":"Sac à dos scolaire","prix":4500,"section":"sacs","image":"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-34","designation":"Sac à dos compact","prix":3500,"section":"sacs","image":"https://images.unsplash.com/photo-1622560480654-d96214fdc887?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-35","designation":"Sac de sortie femme","prix":3000,"section":"sacs","image":"https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-36","designation":"Pochette élégante","prix":2000,"section":"sacs","image":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=80","demo":True}
+                    {"id":"demo-36","designation":"Pochette élégante","prix":2000,"section":"sacs","image":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-37","designation":"Sac à main femme élégant","prix":4500,"section":"sacs","image":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-38","designation":"Sac bandoulière femme","prix":3500,"section":"sacs","image":"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-39","designation":"Sac à main beige","prix":4000,"section":"sacs","image":"https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-40","designation":"Petit sac de soirée","prix":2500,"section":"sacs","image":"https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-41","designation":"Sac porté épaule femme","prix":5000,"section":"sacs","image":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-42","designation":"Sac à main noir","prix":3000,"section":"sacs","image":"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-43","designation":"Sac à main rose","prix":3500,"section":"sacs","image":"https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-44","designation":"Pochette de sortie femme","prix":2000,"section":"sacs","image":"https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?auto=format&fit=crop&w=700&q=80","demo":True}
                 ]
             return render_template("section.html", name=name, produits=prods)
             
