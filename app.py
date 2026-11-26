@@ -10,6 +10,454 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+DEMO_CATALOG = {
+    "demo-01": {
+        "name": "Chemise homme blanche",
+        "price": 2500,
+        "section": "homme"
+    },
+    "demo-02": {
+        "name": "Polo homme classique",
+        "price": 2000,
+        "section": "homme"
+    },
+    "demo-03": {
+        "name": "Jean homme coupe droite",
+        "price": 3000,
+        "section": "homme"
+    },
+    "demo-04": {
+        "name": "Pantalon chino homme",
+        "price": 2500,
+        "section": "homme"
+    },
+    "demo-05": {
+        "name": "T-shirt homme essentiel",
+        "price": 1500,
+        "section": "homme"
+    },
+    "demo-06": {
+        "name": "Veste urbaine homme",
+        "price": 3000,
+        "section": "homme"
+    },
+    "demo-07": {
+        "name": "Robe élégante femme",
+        "price": 3000,
+        "section": "femme"
+    },
+    "demo-08": {
+        "name": "Ensemble femme chic",
+        "price": 3000,
+        "section": "femme"
+    },
+    "demo-09": {
+        "name": "Chemisier femme",
+        "price": 2000,
+        "section": "femme"
+    },
+    "demo-10": {
+        "name": "Jupe midi femme",
+        "price": 2000,
+        "section": "femme"
+    },
+    "demo-11": {
+        "name": "Jean femme",
+        "price": 3000,
+        "section": "femme"
+    },
+    "demo-12": {
+        "name": "Top femme moderne",
+        "price": 1500,
+        "section": "femme"
+    },
+    "demo-13": {
+        "name": "Ensemble enfant garçon",
+        "price": 2500,
+        "section": "enfant"
+    },
+    "demo-14": {
+        "name": "Robe enfant fille",
+        "price": 2500,
+        "section": "enfant"
+    },
+    "demo-15": {
+        "name": "T-shirt enfant",
+        "price": 1000,
+        "section": "enfant"
+    },
+    "demo-16": {
+        "name": "Baskets lifestyle",
+        "price": 10000,
+        "section": "chaussures"
+    },
+    "demo-17": {
+        "name": "Sandales femme",
+        "price": 5000,
+        "section": "chaussures"
+    },
+    "demo-18": {
+        "name": "Chaussures habillées homme",
+        "price": 12000,
+        "section": "chaussures"
+    },
+    "demo-19": {
+        "name": "Sac à main élégant",
+        "price": 5000,
+        "section": "sacs"
+    },
+    "demo-20": {
+        "name": "Sac à dos urbain",
+        "price": 4000,
+        "section": "sacs"
+    },
+    "demo-21": {
+        "name": "Sac de voyage",
+        "price": 5000,
+        "section": "sacs"
+    },
+    "demo-22": {
+        "name": "Montre classique",
+        "price": 7000,
+        "section": "accessoires"
+    },
+    "demo-23": {
+        "name": "Lunettes de soleil",
+        "price": 3000,
+        "section": "accessoires"
+    },
+    "demo-24": {
+        "name": "Ceinture en cuir",
+        "price": 3000,
+        "section": "accessoires"
+    },
+    "demo-25": {
+        "name": "Boubou traditionnel homme",
+        "price": 3000,
+        "section": "traditionnel"
+    },
+    "demo-26": {
+        "name": "Ensemble africain femme",
+        "price": 3000,
+        "section": "traditionnel"
+    },
+    "demo-27": {
+        "name": "Casquette urbaine",
+        "price": 2500,
+        "section": "accessoires"
+    },
+    "demo-28": {
+        "name": "Sac à main tendance",
+        "price": 4500,
+        "section": "sacs"
+    },
+    "demo-29": {
+        "name": "Sac à main petit format",
+        "price": 3000,
+        "section": "sacs"
+    },
+    "demo-30": {
+        "name": "Sac à main bandoulière",
+        "price": 4000,
+        "section": "sacs"
+    },
+    "demo-31": {
+        "name": "Sac cabas quotidien",
+        "price": 3500,
+        "section": "sacs"
+    },
+    "demo-32": {
+        "name": "Petit sac chic",
+        "price": 2500,
+        "section": "sacs"
+    },
+    "demo-33": {
+        "name": "Sac à dos scolaire",
+        "price": 4500,
+        "section": "sacs"
+    },
+    "demo-34": {
+        "name": "Sac à dos compact",
+        "price": 3500,
+        "section": "sacs"
+    },
+    "demo-35": {
+        "name": "Sac de sortie femme",
+        "price": 3000,
+        "section": "sacs"
+    },
+    "demo-36": {
+        "name": "Pochette élégante",
+        "price": 2000,
+        "section": "sacs"
+    },
+    "demo-37": {
+        "name": "Sac à main femme élégant",
+        "price": 4500,
+        "section": "sacs"
+    },
+    "demo-38": {
+        "name": "Sac bandoulière femme",
+        "price": 3500,
+        "section": "sacs"
+    },
+    "demo-39": {
+        "name": "Sac à main beige",
+        "price": 4000,
+        "section": "sacs"
+    },
+    "demo-40": {
+        "name": "Petit sac de soirée",
+        "price": 2500,
+        "section": "sacs"
+    },
+    "demo-41": {
+        "name": "Sac porté épaule femme",
+        "price": 5000,
+        "section": "sacs"
+    },
+    "demo-42": {
+        "name": "Sac à main noir",
+        "price": 3000,
+        "section": "sacs"
+    },
+    "demo-43": {
+        "name": "Sac à main rose",
+        "price": 3500,
+        "section": "sacs"
+    },
+    "demo-44": {
+        "name": "Pochette de sortie femme",
+        "price": 2000,
+        "section": "sacs"
+    },
+    "demo-45": {
+        "name": "Derbies homme en cuir ciré noir",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-46": {
+        "name": "Mocassins homme en cuir ciré",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-47": {
+        "name": "Richelieus homme en cuir ciré",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-48": {
+        "name": "Chaussures homme en cuir ciré marron",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-49": {
+        "name": "Derbies homme en cuir ciré bout carré",
+        "price": 2500,
+        "section": "chaussures_homme"
+    },
+    "demo-50": {
+        "name": "Mocassins homme en cuir ciré à boucle",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-51": {
+        "name": "Chaussures habillées homme cuir ciré noir",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-52": {
+        "name": "Derbies homme cuir ciré élégants",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-53": {
+        "name": "Chaussures homme cérémonie cuir ciré",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-54": {
+        "name": "Mocassins homme cuir ciré classiques",
+        "price": 2500,
+        "section": "chaussures_homme"
+    },
+    "demo-55": {
+        "name": "Richelieus homme cuir ciré à lacets",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-56": {
+        "name": "Chaussures homme cuir ciré",
+        "price": 2500,
+        "section": "chaussures_homme"
+    },
+    "demo-57": {
+        "name": "Derbies homme cuir ciré marron foncé",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-58": {
+        "name": "Mocassins homme cuir ciré souples",
+        "price": 2500,
+        "section": "chaussures_homme"
+    },
+    "demo-59": {
+        "name": "Chaussures homme cuir ciré brillantes",
+        "price": 3000,
+        "section": "chaussures_homme"
+    },
+    "demo-60": {
+        "name": "Chaussures bébé premiers pas",
+        "price": 1500,
+        "section": "chaussures_bebe"
+    },
+    "demo-61": {
+        "name": "Baskets bébé souples",
+        "price": 2000,
+        "section": "chaussures_bebe"
+    },
+    "demo-62": {
+        "name": "Petits mocassins bébé",
+        "price": 2500,
+        "section": "chaussures_bebe"
+    },
+    "demo-63": {
+        "name": "Chaussures bébé à scratch",
+        "price": 1500,
+        "section": "chaussures_bebe"
+    },
+    "demo-64": {
+        "name": "Chaussons bébé fermés",
+        "price": 2000,
+        "section": "chaussures_bebe"
+    },
+    "demo-65": {
+        "name": "Baskets bébé légères",
+        "price": 2500,
+        "section": "chaussures_bebe"
+    },
+    "demo-66": {
+        "name": "Chaussures bébé garçon",
+        "price": 1500,
+        "section": "chaussures_bebe"
+    },
+    "demo-67": {
+        "name": "Chaussures bébé fille",
+        "price": 2000,
+        "section": "chaussures_bebe"
+    },
+    "demo-68": {
+        "name": "Petites chaussures bébé blanches",
+        "price": 2500,
+        "section": "chaussures_bebe"
+    },
+    "demo-69": {
+        "name": "Chaussures bébé confort",
+        "price": 1500,
+        "section": "chaussures_bebe"
+    },
+    "demo-70": {
+        "name": "Ballerines femme",
+        "price": 2000,
+        "section": "chaussures_femme"
+    },
+    "demo-71": {
+        "name": "Escarpins femme classiques",
+        "price": 2500,
+        "section": "chaussures_femme"
+    },
+    "demo-72": {
+        "name": "Sandales à talons femme",
+        "price": 3000,
+        "section": "chaussures_femme"
+    },
+    "demo-73": {
+        "name": "Mules femme élégantes",
+        "price": 2000,
+        "section": "chaussures_femme"
+    },
+    "demo-74": {
+        "name": "Baskets femme blanches",
+        "price": 2500,
+        "section": "chaussures_femme"
+    },
+    "demo-75": {
+        "name": "Mocassins femme",
+        "price": 3000,
+        "section": "chaussures_femme"
+    },
+    "demo-76": {
+        "name": "Chaussures plates femme",
+        "price": 2000,
+        "section": "chaussures_femme"
+    },
+    "demo-77": {
+        "name": "Sandales plates femme",
+        "price": 2500,
+        "section": "chaussures_femme"
+    },
+    "demo-78": {
+        "name": "Escarpins femme pointus",
+        "price": 3000,
+        "section": "chaussures_femme"
+    },
+    "demo-79": {
+        "name": "Baskets femme tendance",
+        "price": 2000,
+        "section": "chaussures_femme"
+    },
+    "demo-80": {
+        "name": "Babies femme",
+        "price": 2500,
+        "section": "chaussures_femme"
+    },
+    "demo-81": {
+        "name": "Sandales compensées femme",
+        "price": 3000,
+        "section": "chaussures_femme"
+    },
+    "demo-82": {
+        "name": "Chaussures femme de soirée",
+        "price": 2000,
+        "section": "chaussures_femme"
+    },
+    "demo-83": {
+        "name": "Bottines femme",
+        "price": 2500,
+        "section": "chaussures_femme"
+    },
+    "demo-84": {
+        "name": "Mules femme ouvertes",
+        "price": 3000,
+        "section": "chaussures_femme"
+    },
+    "demo-85": {
+        "name": "Baskets femme sport",
+        "price": 2000,
+        "section": "chaussures_femme"
+    },
+    "demo-86": {
+        "name": "Sandales à brides femme",
+        "price": 2500,
+        "section": "chaussures_femme"
+    },
+    "demo-87": {
+        "name": "Chaussures femme habillées",
+        "price": 3000,
+        "section": "chaussures_femme"
+    },
+    "demo-88": {
+        "name": "Ballerines femme chic",
+        "price": 2000,
+        "section": "chaussures_femme"
+    },
+    "demo-89": {
+        "name": "Escarpins femme sobres",
+        "price": 2500,
+        "section": "chaussures_femme"
+    }
+}
+
 # --- CLIENT VERCEL KV (API REST) ---
 class VercelKVClient:
     def __init__(self):
@@ -184,7 +632,7 @@ def view_section(name):
                     {"id":"demo-69","designation":"Chaussures bébé confort","prix":1500,"section":"chaussures_bebe","image":"https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-70","designation":"Ballerines femme","prix":2000,"section":"chaussures_femme","image":"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-71","designation":"Escarpins femme classiques","prix":2500,"section":"chaussures_femme","image":"https://images.unsplash.com/photo-1560343090-f0409e92791a?auto=format&fit=crop&w=700&q=80","demo":True},
-                    {"id":"demo-72","designation":"Sandales à talons femme","prix":3000,"section":"chaussures_femme","image":"https://images.unsplash.com/photo-1515347619252-60a4bf4 stomach?auto=format&fit=crop&w=700&q=80","demo":True},
+                    {"id":"demo-72","designation":"Sandales à talons femme","prix":3000,"section":"chaussures_femme","image":"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-73","designation":"Mules femme élégantes","prix":2000,"section":"chaussures_femme","image":"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-74","designation":"Baskets femme blanches","prix":2500,"section":"chaussures_femme","image":"https://images.unsplash.com/photo-1560343090-f0409e92791a?auto=format&fit=crop&w=700&q=80","demo":True},
                     {"id":"demo-75","designation":"Mocassins femme","prix":3000,"section":"chaussures_femme","image":"https://images.unsplash.com/photo-1515347619252-60a4bf4e2c1?auto=format&fit=crop&w=700&q=80","demo":True},
@@ -273,17 +721,28 @@ def passer_commande():
     if not all(data.get(k) for k in required) or not isinstance(data.get("panier"), list) or not data["panier"]:
         return jsonify({"success": False, "message": "Données incomplètes."}), 400
     items, total = [], 0
+    produits_officiels = kv.get("dict:produits") or {}
     for item in data["panier"]:
         try:
-            name = str(item.get("name", "")).strip()[:160]
-            price, quantity = int(float(item.get("price", 0))), int(item.get("quantity", 0))
-        except (TypeError, ValueError):
+            product_id = str(item.get("id", "")).strip()[:80]
+            quantity = int(item.get("quantity", 0))
+            if product_id in produits_officiels:
+                produit = produits_officiels[product_id]
+                name = str(produit.get("designation", "")).strip()[:160]
+                price = int(float(produit.get("prix", 0)))
+            elif product_id in DEMO_CATALOG:
+                produit = DEMO_CATALOG[product_id]
+                name = str(produit["name"])[:160]
+                price = int(produit["price"])
+            else:
+                return jsonify({"success": False, "message": "Article indisponible. Actualisez le catalogue."}), 400
+        except (TypeError, ValueError, KeyError):
             return jsonify({"success": False, "message": "Article invalide."}), 400
-        if not name or price <= 0 or quantity < 1 or quantity > 50:
+        if not product_id or not name or price <= 0 or quantity < 1 or quantity > 50:
             return jsonify({"success": False, "message": "Article invalide."}), 400
         subtotal = price * quantity
         total += subtotal
-        items.append({"id": str(item.get("id", ""))[:80], "name": name, "price": price, "quantity": quantity, "subtotal": subtotal})
+        items.append({"id": product_id, "name": name, "price": price, "quantity": quantity, "subtotal": subtotal})
     order_id = "SS-" + uuid.uuid4().hex[:10].upper()
     order = {"order_id": order_id, "status": "À confirmer", "nom": str(data["nom"]).strip()[:120],
         "pays": str(data["pays"]).strip()[:80], "ville": str(data["ville"]).strip()[:100],
@@ -325,9 +784,11 @@ def soumettre_candidature():
 def envoyer_telegram(texte, mode="HTML"):
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return jsonify({"success": False, "status": "not_configured"}), 503
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     try:
-        res = requests.post(url, json={"chat_id": chat_id, "text": texte, "parse_mode": mode})
+        res = requests.post(url, json={"chat_id": chat_id, "text": texte, "parse_mode": mode}, timeout=10)
         return jsonify({"success": res.status_code == 200, "status": "success" if res.status_code == 200 else "error"})
     except:
         return jsonify({"success": False, "status": "error"}), 500
