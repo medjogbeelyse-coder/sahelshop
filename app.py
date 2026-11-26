@@ -717,48 +717,93 @@ def view_section(name):
 @app.route("/passer-commande", methods=["POST"])
 def passer_commande():
     data = request.get_json(silent=True) or {}
-    required = ["nom", "pays", "ville", "adresse", "telephone", "panier"]
+    required = ["nom", "pays", "ville", "adresse", "telephone", "panier", "request_id"]
     if not all(data.get(k) for k in required) or not isinstance(data.get("panier"), list) or not data["panier"]:
-        return jsonify({"success": False, "message": "Données incomplètes."}), 400
-    items, total = [], 0
-    produits_officiels = kv.get("dict:produits") or {}
-    for item in data["panier"]:
-        try:
-            product_id = str(item.get("id", "")).strip()[:80]
-            quantity = int(item.get("quantity", 0))
-            if product_id in produits_officiels:
-                produit = produits_officiels[product_id]
-                name = str(produit.get("designation", "")).strip()[:160]
-                price = int(float(produit.get("prix", 0)))
-            elif product_id in DEMO_CATALOG:
-                produit = DEMO_CATALOG[product_id]
-                name = str(produit["name"])[:160]
-                price = int(produit["price"])
-            else:
-                return jsonify({"success": False, "message": "Article indisponible. Actualisez le catalogue."}), 400
-        except (TypeError, ValueError, KeyError):
-            return jsonify({"success": False, "message": "Article invalide."}), 400
-        if not product_id or not name or price <= 0 or quantity < 1 or quantity > 50:
-            return jsonify({"success": False, "message": "Article invalide."}), 400
-        subtotal = price * quantity
-        total += subtotal
-        items.append({"id": product_id, "name": name, "price": price, "quantity": quantity, "subtotal": subtotal})
-    order_id = "SS-" + uuid.uuid4().hex[:10].upper()
-    order = {"order_id": order_id, "status": "À confirmer", "nom": str(data["nom"]).strip()[:120],
-        "pays": str(data["pays"]).strip()[:80], "ville": str(data["ville"]).strip()[:100],
-        "adresse": str(data["adresse"]).strip()[:240], "telephone": str(data["telephone"]).strip()[:40],
-        "email": str(data.get("email", "")).strip()[:160], "livraison": str(data.get("livraison", "Livraison à domicile"))[:80],
-        "paiement": str(data.get("paiement", "Paiement à la livraison"))[:80], "items": items,
-        "subtotal": total, "delivery_fee": None, "total": total,
-        "created_at": __import__("datetime").datetime.utcnow().isoformat() + "Z"}
-    if not kv.set("order:" + order_id, order):
-        return jsonify({"success": False, "message": "Enregistrement impossible. Réessayez."}), 503
+        return jsonify({"success": False, "message": "Données de commande incomplètes."}), 400
+
+    try:
+        request_id = str(uuid.UUID(str(data["request_id"]).strip()))
+    except (ValueError, TypeError, AttributeError):
+        return jsonify({"success": False, "message": "Identifiant de commande invalide. Rechargez la page."}), 400
+
+    order_id = "SS-" + uuid.uuid5(uuid.NAMESPACE_URL, "sahelshop:" + request_id).hex[:10].upper()
+    order_key = "order:" + order_id
+    existing_order = kv.get(order_key)
+
+    if isinstance(existing_order, dict) and existing_order.get("notification_sent"):
+        return jsonify({"success": True, "order_saved": True, "order_id": order_id, "notification_sent": True})
+
+    if isinstance(existing_order, dict):
+        order = existing_order
+    else:
+        items, total = [], 0
+        produits_officiels = kv.get("dict:produits") or {}
+        for item in data["panier"]:
+            try:
+                product_id = str(item.get("id", "")).strip()[:80]
+                quantity = int(item.get("quantity", 0))
+                if product_id in produits_officiels:
+                    produit = produits_officiels[product_id]
+                    name = str(produit.get("designation", "")).strip()[:160]
+                    price = int(float(produit.get("prix", 0)))
+                elif product_id in DEMO_CATALOG:
+                    produit = DEMO_CATALOG[product_id]
+                    name = str(produit["name"])[:160]
+                    price = int(produit["price"])
+                else:
+                    return jsonify({"success": False, "message": "Article indisponible. Actualisez le catalogue."}), 400
+            except (TypeError, ValueError, KeyError, AttributeError):
+                return jsonify({"success": False, "message": "Un article du panier est invalide."}), 400
+
+            if not product_id or not name or price <= 0 or quantity < 1 or quantity > 50:
+                return jsonify({"success": False, "message": "Un article du panier est invalide."}), 400
+
+            subtotal = price * quantity
+            total += subtotal
+            items.append({"id": product_id, "name": name, "price": price, "quantity": quantity, "subtotal": subtotal})
+
+        order = {
+            "order_id": order_id, "status": "À confirmer", "notification_sent": False,
+            "nom": str(data["nom"]).strip()[:120], "pays": str(data["pays"]).strip()[:80],
+            "ville": str(data["ville"]).strip()[:100], "adresse": str(data["adresse"]).strip()[:240],
+            "telephone": str(data["telephone"]).strip()[:40], "email": str(data.get("email", "")).strip()[:160],
+            "livraison": str(data.get("livraison", "Livraison à domicile"))[:80],
+            "paiement": str(data.get("paiement", "Paiement à la livraison"))[:80],
+            "items": items, "subtotal": total, "delivery_fee": None, "total": total,
+            "created_at": __import__("datetime").datetime.utcnow().isoformat() + "Z"
+        }
+        if not kv.set(order_key, order):
+            return jsonify({"success": False, "message": "Enregistrement impossible. Réessayez sans perdre votre panier."}), 503
+
     safe = lambda value: html.escape(str(value))
-    item_lines = "\n".join(["• <b>" + safe(x["name"]) + "</b> (x" + str(x["quantity"]) + ") — " + format(x["subtotal"], ",") + " F" for x in items])
-    message = "📦 <b>NOUVELLE COMMANDE " + order_id + "</b>\n" + "👤 <b>Client :</b> " + safe(order["nom"]) + "\n" + "🌍 <b>Destination :</b> " + safe(order["pays"]) + " (" + safe(order["ville"]) + ")\n" + "📍 <b>Adresse :</b> " + safe(order["adresse"]) + "\n" + "📞 <b>Téléphone :</b> " + safe(order["telephone"]) + "\n" + "💳 <b>Paiement :</b> " + safe(order["paiement"]) + "\n" + "🚚 <b>Réception :</b> " + safe(order["livraison"]) + "\n" + "🛒 <b>Articles :</b>\n" + item_lines + "\n" + "💵 <b>Sous-total : " + format(total, ",") + " F CFA</b>\nLivraison à confirmer"
+    item_lines = "\n".join([
+        "• <b>" + safe(x["name"]) + "</b> (x" + str(x["quantity"]) + ") — " + format(x["subtotal"], ",") + " F"
+        for x in order["items"]
+    ])
+    message = (
+        "📦 <b>NOUVELLE COMMANDE " + safe(order_id) + "</b>\n"
+        + "👤 <b>Client :</b> " + safe(order["nom"]) + "\n"
+        + "🌍 <b>Destination :</b> " + safe(order["pays"]) + " (" + safe(order["ville"]) + ")\n"
+        + "📍 <b>Adresse :</b> " + safe(order["adresse"]) + "\n"
+        + "📞 <b>Téléphone :</b> " + safe(order["telephone"]) + "\n"
+        + "💳 <b>Paiement :</b> " + safe(order["paiement"]) + "\n"
+        + "🚚 <b>Réception :</b> " + safe(order["livraison"]) + "\n"
+        + "🛒 <b>Articles :</b>\n" + item_lines + "\n"
+        + "💵 <b>Sous-total : " + format(order["subtotal"], ",") + " F CFA</b>\n"
+        + "Livraison à confirmer"
+    )
     telegram_response = envoyer_telegram(message)
     result = telegram_response.get_json(silent=True) or {}
-    return jsonify({"success": True, "order_id": order_id, "notification_sent": bool(result.get("success"))})
+    if result.get("success"):
+        order["notification_sent"] = True
+        kv.set(order_key, order)
+        return jsonify({"success": True, "order_saved": True, "order_id": order_id, "notification_sent": True})
+
+    return jsonify({
+        "success": False, "order_saved": True, "order_id": order_id,
+        "notification_sent": False,
+        "message": result.get("message") or "La commande est enregistrée, mais Telegram n'a pas confirmé la réception. Réessayez."
+    }), 502
 
 @app.route("/api/investissement", methods=["POST"])
 def api_investissement():
@@ -782,16 +827,36 @@ def soumettre_candidature():
     return envoyer_telegram(message, mode="Markdown")
 
 def envoyer_telegram(texte, mode="HTML"):
-    token = os.environ.get("TELEGRAM_BOT_TOKEN")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
     if not token or not chat_id:
-        return jsonify({"success": False, "status": "not_configured"}), 503
+        response = jsonify({"success": False, "status": "not_configured", "message": "Telegram n'est pas configuré sur le serveur."})
+        response.status_code = 503
+        return response
+
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     try:
-        res = requests.post(url, json={"chat_id": chat_id, "text": texte, "parse_mode": mode}, timeout=10)
-        return jsonify({"success": res.status_code == 200, "status": "success" if res.status_code == 200 else "error"})
-    except:
-        return jsonify({"success": False, "status": "error"}), 500
+        res = requests.post(
+            url,
+            json={"chat_id": chat_id, "text": texte, "parse_mode": mode, "disable_web_page_preview": True},
+            timeout=12
+        )
+        try:
+            payload = res.json()
+        except ValueError:
+            payload = {}
+        ok = res.ok and payload.get("ok") is True
+        response = jsonify({
+            "success": ok,
+            "status": "success" if ok else "telegram_error",
+            "message": "" if ok else str(payload.get("description", "Telegram a refusé le message."))[:300]
+        })
+        response.status_code = 200 if ok else 502
+        return response
+    except requests.RequestException:
+        response = jsonify({"success": False, "status": "network_error", "message": "Connexion à Telegram impossible."})
+        response.status_code = 502
+        return response
 
 # --- PANNEAU D'ADMINISTRATION (/MEDJOGBE11) ---
 
