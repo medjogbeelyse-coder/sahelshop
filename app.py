@@ -757,6 +757,7 @@ def passer_commande():
     if isinstance(existing_order, dict) and existing_order.get("notification_sent"):
         return jsonify({"success": True, "order_saved": True, "order_id": order_id, "notification_sent": True})
 
+    order_saved = isinstance(existing_order, dict)
     if isinstance(existing_order, dict):
         order = existing_order
     else:
@@ -796,8 +797,9 @@ def passer_commande():
             "items": items, "subtotal": total, "delivery_fee": None, "total": total,
             "created_at": __import__("datetime").datetime.utcnow().isoformat() + "Z"
         }
-        if not kv.set(order_key, order):
-            return jsonify({"success": False, "message": "Enregistrement impossible. Réessayez sans perdre votre panier."}), 503
+        order_saved = kv.set(order_key, order)
+        if not order_saved:
+            print(f"[COMMANDE] Stockage KV indisponible pour {order_id}; tentative de notification Telegram maintenue.")
 
     safe = lambda value: html.escape(str(value))
     item_lines = "\n".join([
@@ -820,8 +822,14 @@ def passer_commande():
     result = telegram_response.get_json(silent=True) or {}
     if result.get("success"):
         order["notification_sent"] = True
-        kv.set(order_key, order)
-        return jsonify({"success": True, "order_saved": True, "order_id": order_id, "notification_sent": True})
+        order_saved = kv.set(order_key, order) or order_saved
+        return jsonify({
+            "success": True,
+            "order_saved": bool(order_saved),
+            "order_id": order_id,
+            "notification_sent": True,
+            "message": "Commande transmise au vendeur." if order_saved else "Commande transmise au vendeur par Telegram. Archivage administratif temporairement indisponible."
+        })
 
     return jsonify({
         "success": False, "order_saved": True, "order_id": order_id,
@@ -886,36 +894,6 @@ def envoyer_telegram(texte, mode="HTML"):
         response = jsonify({"success": False, "status": "network_error", "message": "Connexion à Telegram impossible."})
         response.status_code = 502
         return response
-
-# --- TEST TECHNIQUE TEMPORAIRE TELEGRAM (clé secrète requise) ---
-@app.route("/api/telegram-test", methods=["GET"])
-def tester_telegram():
-    expected = (os.getenv("SAHEL_TELEGRAM_TEST_KEY") or "").strip()
-    supplied = (request.args.get("key") or "").strip()
-    if not expected or not supplied or supplied != expected:
-        return jsonify({"success": False, "message": "Accès refusé."}), 403
-
-    test_value = {"status": "ok", "source": "sahelshop_telegram_test"}
-    storage_ok = kv.set("health:sahelshop_telegram_test", test_value)
-    stored_value = kv.get("health:sahelshop_telegram_test") if storage_ok else None
-    storage_verified = stored_value == test_value
-
-    result = envoyer_telegram(
-        "✅ TEST TECHNIQUE SAHEL SHOP\nVérification de la liaison Telegram pour les notifications de commande."
-    )
-    payload = result.get_json(silent=True) or {}
-    telegram_sent = bool(payload.get("success"))
-    all_ok = storage_verified and telegram_sent
-    return jsonify({
-        "success": all_ok,
-        "storage_ok": storage_ok,
-        "storage_verified": storage_verified,
-        "storage_error": "" if storage_verified else (kv.last_error or "La commande SET n'a pas retourné OK."),
-        "telegram_sent": telegram_sent,
-        "telegram_error": "" if telegram_sent else payload.get("message", "Échec Telegram."),
-        "message": "Stockage et Telegram fonctionnent." if all_ok else "Le test a identifié un composant en échec."
-    }), 200 if all_ok else 503
-
 
 # --- PANNEAU D'ADMINISTRATION (/MEDJOGBE11) ---
 
