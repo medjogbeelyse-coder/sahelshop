@@ -484,13 +484,13 @@ class VercelKVClient:
 kv = VercelKVClient()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "prime_business_2026_vercel_key")
+app.secret_key = os.environ.get("SECRET_KEY")
 
 # --- CONFIGURATION CLOUDINARY ---
 cloudinary.config( 
-  cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME", "ds5exviel"), 
-  api_key = os.environ.get("CLOUDINARY_API_KEY", "128277898241178"), 
-  api_secret = os.environ.get("CLOUDINARY_API_SECRET", "VhODvT9UTr0wim4SZuFPR-UmixE")
+  cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME"), 
+  api_key = os.environ.get("CLOUDINARY_API_KEY"), 
+  api_secret = os.environ.get("CLOUDINARY_API_SECRET")
 )
 
 # --- INJECTION DES FLAGS ---
@@ -798,7 +798,7 @@ def envoyer_telegram(texte, mode="HTML"):
 @app.route("/MEDJOGBE11", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        if request.form.get("password") == os.environ.get("ADMIN_PWD", "Azouassi@11"): 
+        if request.form.get("password") == os.environ.get("ADMIN_PWD"): 
             session["admin_logged_in"] = True
             return redirect(url_for("admin_panel"))
         flash("Mot de passe incorrect")
@@ -820,6 +820,9 @@ def admin_panel():
             file = request.files.get('image_file')
             img_url, p_id = "", ""
             if file and file.filename != '':
+                if not all(os.environ.get(k) for k in ('CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET')):
+                    flash('Configuration des images indisponible. Les identifiants Cloudinary doivent être configurés.')
+                    return redirect(url_for('admin_panel'))
                 res = cloudinary.uploader.upload(file)
                 img_url, p_id = res['secure_url'], res['public_id']
             
