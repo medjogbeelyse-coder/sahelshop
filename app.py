@@ -899,26 +899,22 @@ def tester_telegram():
     storage_ok = kv.set("health:sahelshop_telegram_test", test_value)
     stored_value = kv.get("health:sahelshop_telegram_test") if storage_ok else None
     storage_verified = stored_value == test_value
-    if not storage_verified:
-        return jsonify({
-            "success": False,
-            "storage_ok": storage_ok,
-            "storage_verified": False,
-            "telegram_sent": False,
-            "message": "Le stockage KV ne confirme pas l'enregistrement.",
-            "storage_error": kv.last_error or "La commande SET n'a pas retourné OK."
-        }), 503
 
     result = envoyer_telegram(
-        "✅ TEST TECHNIQUE SAHEL SHOP\nLe stockage des commandes et la connexion Telegram sont en cours de vérification."
+        "✅ TEST TECHNIQUE SAHEL SHOP\nVérification de la liaison Telegram pour les notifications de commande."
     )
     payload = result.get_json(silent=True) or {}
+    telegram_sent = bool(payload.get("success"))
+    all_ok = storage_verified and telegram_sent
     return jsonify({
-        "success": bool(payload.get("success")),
-        "storage_verified": True,
-        "telegram_sent": bool(payload.get("success")),
-        "message": "Message de test envoyé." if payload.get("success") else payload.get("message", "Échec Telegram.")
-    }), result.status_code
+        "success": all_ok,
+        "storage_ok": storage_ok,
+        "storage_verified": storage_verified,
+        "storage_error": "" if storage_verified else (kv.last_error or "La commande SET n'a pas retourné OK."),
+        "telegram_sent": telegram_sent,
+        "telegram_error": "" if telegram_sent else payload.get("message", "Échec Telegram."),
+        "message": "Stockage et Telegram fonctionnent." if all_ok else "Le test a identifié un composant en échec."
+    }), 200 if all_ok else 503
 
 
 # --- PANNEAU D'ADMINISTRATION (/MEDJOGBE11) ---
