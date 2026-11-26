@@ -921,83 +921,36 @@ def admin_panel():
         return redirect(url_for("admin_login"))
 
     if request.method == "POST":
-        if "flag_key" in request.form:
-            key = request.form.get("flag_key")
-            current = kv.get(f"flag:{key}")
-            current = True if current is None else current
-            kv.set(f"flag:{key}", not current)
-        
-        elif "designation" in request.form:
-            file = request.files.get('image_file')
-            img_url, p_id = "", ""
-            if file and file.filename != '':
-                if not all(os.environ.get(k) for k in ('CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET')):
-                    flash('Configuration des images indisponible. Les identifiants Cloudinary doivent être configurés.')
-                    return redirect(url_for('admin_panel'))
-                res = cloudinary.uploader.upload(file)
-                img_url, p_id = res['secure_url'], res['public_id']
-            
-            import time
-            new_id = str(int(time.time()))
-            
-            produits_dict = kv.get("dict:produits") or {}
-            produits_dict[new_id] = {
-                "designation": request.form.get("designation"),
-                "prix": request.form.get("price"),
-                "section": request.form.get("category"),
-                "image": img_url,
-                "cloudinary_id": p_id
-            }
-            kv.set("dict:produits", produits_dict)
-
-        elif "delete_id" in request.form:
-            del_id = request.form.get("delete_id")
-            produits_dict = kv.get("dict:produits") or {}
-            
-            if del_id in produits_dict:
-                p_data = produits_dict[del_id]
-                if p_data.get("cloudinary_id"):
-                    cloudinary.uploader.destroy(p_data.get("cloudinary_id"))
-                del produits_dict[del_id]
-                kv.set("dict:produits", produits_dict)
-
-        elif "titre_poste" in request.form:
-            postes_list = kv.get("list:postes") or []
-            postes_list.append(request.form.get("titre_poste"))
-            kv.set("list:postes", postes_list)
+        if "titre_poste" in request.form:
+            titre = str(request.form.get("titre_poste", "")).strip()[:120]
+            if titre:
+                postes_list = kv.get("list:postes") or []
+                if not isinstance(postes_list, list):
+                    postes_list = []
+                postes_list.append(titre)
+                kv.set("list:postes", postes_list)
 
         elif "delete_poste_id" in request.form:
             try:
                 idx = int(request.form.get("delete_poste_id"))
                 postes_list = kv.get("list:postes") or []
-                if 0 <= idx < len(postes_list):
+                if isinstance(postes_list, list) and 0 <= idx < len(postes_list):
                     postes_list.pop(idx)
                     kv.set("list:postes", postes_list)
-            except:
+            except (TypeError, ValueError):
                 pass
 
         return redirect(url_for("admin_panel"))
 
     postes_list = kv.get("list:postes") or []
-    postes = [{"id": i, "titre": p} for i, p in enumerate(postes_list)]
-    
-    produits_dict = kv.get("dict:produits") or {}
-    produits = []
-    for k, v in produits_dict.items():
-        v["id"] = k
-        try:
-            v["prix"] = float(v.get("prix", 0))
-        except:
-            v["prix"] = 0.0
-        produits.append(v)
+    if not isinstance(postes_list, list):
+        postes_list = []
+    postes = [
+        {"id": i, "titre": p.get("titre", "") if isinstance(p, dict) else str(p)}
+        for i, p in enumerate(postes_list)
+    ]
 
-    flags = {
-        "commerce": kv.get("flag:commerce") if kv.get("flag:commerce") is not None else True,
-        "investissement": kv.get("flag:investissement") if kv.get("flag:investissement") is not None else True,
-        "recrutement": kv.get("flag:recrutement") if kv.get("flag:recrutement") is not None else True
-    }
-
-    return render_template("admin_panel.html", flags=flags, produits=produits, postes=postes)
+    return render_template("admin_panel.html", postes=postes)
 
 @app.route("/MEDJOGBE11/logout")
 def admin_logout():
