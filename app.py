@@ -3,6 +3,8 @@ import requests
 import cloudinary
 import cloudinary.uploader
 import json
+import uuid
+import html
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from dotenv import load_dotenv
 
@@ -24,9 +26,10 @@ class VercelKVClient:
     def set(self, key, value):
         if not self.url or not self.token: return False
         try:
-            requests.post(f"{self.url}/set/{key}", 
-                          headers={"Authorization": f"Bearer {self.token}"}, 
-                          data=json.dumps(value))
+            res = requests.post(f"{self.url}/set/{key}",
+                                headers={"Authorization": f"Bearer {self.token}"},
+                                data=json.dumps(value), timeout=8)
+            res.raise_for_status()
             return True
         except: return False
 
@@ -265,24 +268,38 @@ def view_section(name):
 
 @app.route("/passer-commande", methods=["POST"])
 def passer_commande():
-    data = request.get_json()
-    if not data or not all([data.get("nom"), data.get("pays"), data.get("ville"), data.get("telephone"), data.get("panier")]):
-        return jsonify({"success": False, "message": "Données incomplètes"}), 400
-
-    texte_panier = ""
-    total_financier = 0
-    for item in data['panier']:
-        sous_total = item['price'] * item['quantity']
-        total_financier += sous_total
-        texte_panier += f"• <b>{item['name']}</b> (x{item['quantity']}) — {sous_total:,} F\n"
-
-    message = (
-        f"📦 <b>NOUVELLE COMMANDE REÇUE !</b>\n━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"👤 <b>Client :</b> {data['nom']}\n📧 <b>E-mail :</b> {data.get('email', 'Non renseigné')}\n"
-        f"🌍 <b>Destination :</b> {data['pays']} ({data['ville']})\n📞 <b>Tél 1 :</b> {data['telephone']}\n"
-        f"🛒 <b>Détails :</b>\n{texte_panier}\n💵 <b>TOTAL : {total_financier:,} F</b>\n━━━━━━━━━━━━━━━━━━━━━"
-    )
-    return envoyer_telegram(message)
+    data = request.get_json(silent=True) or {}
+    required = ["nom", "pays", "ville", "adresse", "telephone", "panier"]
+    if not all(data.get(k) for k in required) or not isinstance(data.get("panier"), list) or not data["panier"]:
+        return jsonify({"success": False, "message": "Données incomplètes."}), 400
+    items, total = [], 0
+    for item in data["panier"]:
+        try:
+            name = str(item.get("name", "")).strip()[:160]
+            price, quantity = int(float(item.get("price", 0))), int(item.get("quantity", 0))
+        except (TypeError, ValueError):
+            return jsonify({"success": False, "message": "Article invalide."}), 400
+        if not name or price <= 0 or quantity < 1 or quantity > 50:
+            return jsonify({"success": False, "message": "Article invalide."}), 400
+        subtotal = price * quantity
+        total += subtotal
+        items.append({"id": str(item.get("id", ""))[:80], "name": name, "price": price, "quantity": quantity, "subtotal": subtotal})
+    order_id = "SS-" + uuid.uuid4().hex[:10].upper()
+    order = {"order_id": order_id, "status": "À confirmer", "nom": str(data["nom"]).strip()[:120],
+        "pays": str(data["pays"]).strip()[:80], "ville": str(data["ville"]).strip()[:100],
+        "adresse": str(data["adresse"]).strip()[:240], "telephone": str(data["telephone"]).strip()[:40],
+        "email": str(data.get("email", "")).strip()[:160], "livraison": str(data.get("livraison", "Livraison à domicile"))[:80],
+        "paiement": str(data.get("paiement", "Paiement à la livraison"))[:80], "items": items,
+        "subtotal": total, "delivery_fee": None, "total": total,
+        "created_at": __import__("datetime").datetime.utcnow().isoformat() + "Z"}
+    if not kv.set("order:" + order_id, order):
+        return jsonify({"success": False, "message": "Enregistrement impossible. Réessayez."}), 503
+    safe = lambda value: html.escape(str(value))
+    item_lines = "\\n".join(["• <b>" + safe(x["name"]) + "</b> (x" + str(x["quantity"]) + ") — " + format(x["subtotal"], ",") + " F" for x in items])
+    message = "📦 <b>NOUVELLE COMMANDE " + order_id + "</b>\\n" + "👤 <b>Client :</b> " + safe(order["nom"]) + "\\n" + "🌍 <b>Destination :</b> " + safe(order["pays"]) + " (" + safe(order["ville"]) + ")\\n" + "📍 <b>Adresse :</b> " + safe(order["adresse"]) + "\\n" + "📞 <b>Téléphone :</b> " + safe(order["telephone"]) + "\\n" + "💳 <b>Paiement :</b> " + safe(order["paiement"]) + "\\n" + "🚚 <b>Réception :</b> " + safe(order["livraison"]) + "\\n" + "🛒 <b>Articles :</b>\\n" + item_lines + "\\n" + "💵 <b>Sous-total : " + format(total, ",") + " F CFA</b>\\nLivraison à confirmer"
+    telegram_response = envoyer_telegram(message)
+    result = telegram_response.get_json(silent=True) or {}
+    return jsonify({"success": True, "order_id": order_id, "notification_sent": bool(result.get("success"))})
 
 @app.route("/api/investissement", methods=["POST"])
 def api_investissement():
