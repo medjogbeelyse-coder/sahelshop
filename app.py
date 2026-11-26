@@ -463,6 +463,7 @@ class VercelKVClient:
     def __init__(self):
         self.url = (os.getenv("KV_REST_API_URL") or "").strip().rstrip("/")
         self.token = (os.getenv("KV_REST_API_TOKEN") or "").strip()
+        self.last_error = ""
 
     def _command(self, command):
         if not self.url or not self.token:
@@ -500,7 +501,8 @@ class VercelKVClient:
             print(f"[KV] SET refusé pour {key}: résultat inattendu ({result!r})")
             return False
         except Exception as exc:
-            print(f"[KV] SET impossible pour {key}: {type(exc).__name__}: {str(exc)[:240]}")
+            self.last_error = f"{type(exc).__name__}: {str(exc)[:240]}"
+            print(f"[KV] SET impossible pour {key}: {self.last_error}")
             return False
 
 kv = VercelKVClient()
@@ -903,7 +905,8 @@ def tester_telegram():
             "storage_ok": storage_ok,
             "storage_verified": False,
             "telegram_sent": False,
-            "message": "Le stockage KV ne confirme pas l'enregistrement. Consultez les journaux Vercel."
+            "message": "Le stockage KV ne confirme pas l'enregistrement.",
+            "storage_error": kv.last_error or "La commande SET n'a pas retourné OK."
         }), 503
 
     result = envoyer_telegram(
