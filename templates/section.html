@@ -127,7 +127,7 @@ document.getElementById("orderForm").addEventListener("submit",async e=>{
   if(!cart.length){document.getElementById("orderMessage").textContent="Votre panier est vide.";return;}
   const data=Object.fromEntries(new FormData(e.target).entries());
   data.request_id=getPendingOrderRequestId();
-  data.panier=cart.map(x=>({id:x.id,quantity:x.quantity}));
+  data.panier=cart.map(x=>({id:x.id,quantity:x.quantity,image:x.image||""}));
   const msg=document.getElementById("orderMessage");
   const submit=e.submitter||e.target.querySelector('button[type="submit"]');
   msg.textContent="Envoi de votre commande…";
