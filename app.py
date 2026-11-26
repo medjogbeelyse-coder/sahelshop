@@ -754,8 +754,8 @@ def passer_commande():
     if not kv.set("order:" + order_id, order):
         return jsonify({"success": False, "message": "Enregistrement impossible. Réessayez."}), 503
     safe = lambda value: html.escape(str(value))
-    item_lines = "\\n".join(["• <b>" + safe(x["name"]) + "</b> (x" + str(x["quantity"]) + ") — " + format(x["subtotal"], ",") + " F" for x in items])
-    message = "📦 <b>NOUVELLE COMMANDE " + order_id + "</b>\\n" + "👤 <b>Client :</b> " + safe(order["nom"]) + "\\n" + "🌍 <b>Destination :</b> " + safe(order["pays"]) + " (" + safe(order["ville"]) + ")\\n" + "📍 <b>Adresse :</b> " + safe(order["adresse"]) + "\\n" + "📞 <b>Téléphone :</b> " + safe(order["telephone"]) + "\\n" + "💳 <b>Paiement :</b> " + safe(order["paiement"]) + "\\n" + "🚚 <b>Réception :</b> " + safe(order["livraison"]) + "\\n" + "🛒 <b>Articles :</b>\\n" + item_lines + "\\n" + "💵 <b>Sous-total : " + format(total, ",") + " F CFA</b>\\nLivraison à confirmer"
+    item_lines = "\n".join(["• <b>" + safe(x["name"]) + "</b> (x" + str(x["quantity"]) + ") — " + format(x["subtotal"], ",") + " F" for x in items])
+    message = "📦 <b>NOUVELLE COMMANDE " + order_id + "</b>\n" + "👤 <b>Client :</b> " + safe(order["nom"]) + "\n" + "🌍 <b>Destination :</b> " + safe(order["pays"]) + " (" + safe(order["ville"]) + ")\n" + "📍 <b>Adresse :</b> " + safe(order["adresse"]) + "\n" + "📞 <b>Téléphone :</b> " + safe(order["telephone"]) + "\n" + "💳 <b>Paiement :</b> " + safe(order["paiement"]) + "\n" + "🚚 <b>Réception :</b> " + safe(order["livraison"]) + "\n" + "🛒 <b>Articles :</b>\n" + item_lines + "\n" + "💵 <b>Sous-total : " + format(total, ",") + " F CFA</b>\nLivraison à confirmer"
     telegram_response = envoyer_telegram(message)
     result = telegram_response.get_json(silent=True) or {}
     return jsonify({"success": True, "order_id": order_id, "notification_sent": bool(result.get("success"))})
