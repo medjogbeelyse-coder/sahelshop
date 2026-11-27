@@ -1072,16 +1072,61 @@ def admin_panel():
             customers_map[phone] = {"nom": order.get("nom", ""), "telephone": phone, "ville": order.get("ville", ""), "pays": order.get("pays", ""), "orders": customers_map.get(phone, {}).get("orders", 0) + 1}
     customers = list(customers_map.values())
 
+    # Statistiques calculées à partir des commandes déjà enregistrées.
+    from datetime import datetime, date, timedelta
+    today = date.today()
+    revenue_orders = [x for x in orders if x.get("status") != "Annulée"]
+    daily_rows = []
+    for offset in range(6, -1, -1):
+        day = today - timedelta(days=offset)
+        day_orders = [x for x in revenue_orders if str(x.get("created_at", ""))[:10] == day.isoformat()]
+        daily_rows.append({
+            "label": day.strftime("%d/%m"),
+            "count": len(day_orders),
+            "revenue": sum(int(x.get("total", 0) or 0) for x in day_orders)
+        })
+
+    monthly_rows = []
+    for offset in range(5, -1, -1):
+        month_index = today.year * 12 + today.month - 1 - offset
+        year, month_zero = divmod(month_index, 12)
+        month = month_zero + 1
+        month_orders = [x for x in revenue_orders if str(x.get("created_at", ""))[:7] == f"{year:04d}-{month:02d}"]
+        monthly_rows.append({
+            "label": f"{month:02d}/{str(year)[-2:]}",
+            "count": len(month_orders),
+            "revenue": sum(int(x.get("total", 0) or 0) for x in month_orders)
+        })
+
+    product_totals = {}
+    for order in revenue_orders:
+        for item in order.get("items", []) or []:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name") or "Article sans nom")
+            try:
+                quantity = int(item.get("quantity", 0) or 0)
+                amount = int(item.get("subtotal", 0) or 0)
+            except (TypeError, ValueError):
+                continue
+            current = product_totals.setdefault(name, {"name": name, "quantity": 0, "revenue": 0})
+            current["quantity"] += max(0, quantity)
+            current["revenue"] += max(0, amount)
+    top_products = sorted(product_totals.values(), key=lambda x: (x["quantity"], x["revenue"]), reverse=True)[:5]
+
     stats = {
         "products": len(products),
         "orders": len(orders),
         "pending_orders": sum(1 for x in orders if x.get("status", "À confirmer") == "À confirmer"),
         "investments": len(investments),
         "customers": len(customers),
-        "revenue": sum(int(x.get("total", 0) or 0) for x in orders if x.get("status") != "Annulée")
+        "revenue": sum(int(x.get("total", 0) or 0) for x in revenue_orders),
+        "delivered": sum(1 for x in orders if x.get("status") == "Livrée"),
+        "cancelled": sum(1 for x in orders if x.get("status") == "Annulée")
     }
     return render_template("admin_dashboard.html", tab=tab, stats=stats, products=products,
         orders=orders, investments=investments, customers=customers,
+        daily_rows=daily_rows, monthly_rows=monthly_rows, top_products=top_products,
         products_error=products_error, orders_error=orders_error, investments_error=investments_error)
 
 @app.route("/MEDJOGBE11/logout")
