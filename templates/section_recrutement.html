@@ -221,5 +221,24 @@ s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
+<script>
+(function(){
+  try {
+    var now=Date.now(), sid=localStorage.getItem('sahelshop_analytics_sid'), stamp=Number(localStorage.getItem('sahelshop_analytics_seen')||0);
+    if(!sid || now-stamp>1800000){sid=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'ss-'+now+'-'+Math.random().toString(36).slice(2);localStorage.setItem('sahelshop_analytics_sid',sid);}
+    localStorage.setItem('sahelshop_analytics_seen',String(now));
+    var ua=navigator.userAgent||'', device=/tablet|ipad/i.test(ua)?'Tablette':/mobile|android|iphone/i.test(ua)?'Mobile':'Ordinateur';
+    var browser=/Edg\//.test(ua)?'Edge':/Firefox\//.test(ua)?'Firefox':/Chrome\//.test(ua)?'Chrome':/Safari\//.test(ua)?'Safari':'Autre';
+    function send(type){
+      var payload=JSON.stringify({type:type,path:location.pathname,sessionId:sid,device:device,browser:browser});
+      var url='https://sahelshop-admin.vercel.app/api/collect';
+      if(navigator.sendBeacon){navigator.sendBeacon(url,new Blob([payload],{type:'text/plain'}));}
+      else {fetch(url,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:payload}).catch(function(){});}
+    }
+    send('pageview');
+    window.setInterval(function(){localStorage.setItem('sahelshop_analytics_seen',String(Date.now()));send('heartbeat');},45000);
+  } catch(e) {}
+})();
+</script>
 </body>
 </html>
