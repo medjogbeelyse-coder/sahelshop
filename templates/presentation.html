@@ -3,4 +3,23 @@
 <body><div class="promo">SAHEL SHOP · MODE ACCESSIBLE · PRIX EN FCFA</div><header class="max-w-7xl mx-auto px-5 py-5 flex items-center justify-between"><a href="/" class="brand"><span>SAHEL</span> SHOP</a><a href="/section/commerce" class="text-xs font-extrabold bg-black text-white px-5 py-3">ENTRER DANS LA BOUTIQUE →</a></header>
 <main><section class="hero"><div class="hero-inner"><p class="text-xs font-extrabold tracking-[.25em] uppercase">La mode à votre portée</p><h1>Le style qui vous ressemble.</h1><p>Sacs, chaussures et vêtements pour chaque envie. Découvrez les collections SAHEL SHOP et trouvez vos prochains essentiels.</p><a class="cta" href="/section/commerce">DÉCOUVRIR LA COLLECTION</a></div></section>
 <section class="max-w-7xl mx-auto px-5 py-12"><div class="flex items-end justify-between mb-5"><div><p class="text-xs font-extrabold tracking-widest text-red-600">NOS COLLECTIONS</p><h2 class="text-2xl font-black mt-2">Explorez par catégorie</h2></div><a href="/section/commerce" class="text-xs font-extrabold text-red-600">TOUT VOIR →</a></div><div class="tiles"><a class="tile" href="/section/commerce#sacs">Sacs femme →</a><a class="tile" href="/section/commerce#catalogue">Chaussures →</a><a class="tile" href="/section/commerce#catalogue">Mode homme →</a><a class="tile" href="/section/commerce#catalogue">Mode femme & enfant →</a></div></section></main>
-<footer class="bg-black text-white text-center text-xs py-7">© SAHEL SHOP · Mode & tendances</footer></body></html>
+<footer class="bg-black text-white text-center text-xs py-7">© SAHEL SHOP · Mode & tendances</footer><script>
+(function(){
+  try {
+    var now=Date.now(), sid=localStorage.getItem('sahelshop_analytics_sid'), stamp=Number(localStorage.getItem('sahelshop_analytics_seen')||0);
+    if(!sid || now-stamp>1800000){sid=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'ss-'+now+'-'+Math.random().toString(36).slice(2);localStorage.setItem('sahelshop_analytics_sid',sid);}
+    localStorage.setItem('sahelshop_analytics_seen',String(now));
+    var ua=navigator.userAgent||'', device=/tablet|ipad/i.test(ua)?'Tablette':/mobile|android|iphone/i.test(ua)?'Mobile':'Ordinateur';
+    var browser=/Edg\//.test(ua)?'Edge':/Firefox\//.test(ua)?'Firefox':/Chrome\//.test(ua)?'Chrome':/Safari\//.test(ua)?'Safari':'Autre';
+    function send(type){
+      var payload=JSON.stringify({type:type,path:location.pathname,sessionId:sid,device:device,browser:browser});
+      var url='https://sahelshop-admin.vercel.app/api/collect';
+      if(navigator.sendBeacon){navigator.sendBeacon(url,new Blob([payload],{type:'text/plain'}));}
+      else {fetch(url,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:payload}).catch(function(){});}
+    }
+    send('pageview');
+    window.setInterval(function(){localStorage.setItem('sahelshop_analytics_seen',String(Date.now()));send('heartbeat');},45000);
+  } catch(e) {}
+})();
+</script>
+</body></html>
