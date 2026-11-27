@@ -1068,6 +1068,7 @@ def admin_panel():
     kv.last_error = ""
     products = kv.get("dict:produits") or {}
     products_error = bool(kv.last_error)
+    products_error_detail = kv.last_error if products_error else ""
     if not isinstance(products, dict):
         products = {}
 
@@ -1155,7 +1156,8 @@ def admin_panel():
     return render_template("admin_dashboard.html", tab=tab, stats=stats, products=products,
         orders=orders, investments=investments, customers=customers,
         daily_rows=daily_rows, monthly_rows=monthly_rows, top_products=top_products,
-        products_error=products_error, orders_error=orders_error, investments_error=investments_error,
+        products_error=products_error, products_error_detail=products_error_detail,
+        orders_error=orders_error, investments_error=investments_error,
         admin_storage_ok=admin_storage_ok, admin_events=admin_events)
 
 @app.route("/MEDJOGBE11/logout")
