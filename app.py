@@ -508,6 +508,65 @@ class VercelKVClient:
 
 kv = VercelKVClient()
 
+# --- STOCKAGE DEDIE A L'ADMINISTRATION (UPSTASH REDIS) ---
+class AdminRedisClient:
+    """Stockage isolé pour les traces d'administration; les données commerciales restent dans kv."""
+    def __init__(self):
+        self.url = (os.getenv("ADMIN_REDIS_URL") or "").strip().rstrip("/")
+        self.token = (os.getenv("ADMIN_REDIS_TOKEN") or "").strip()
+        self.last_error = ""
+
+    def _command(self, command):
+        if not self.url or not self.token:
+            raise RuntimeError("Variables ADMIN_REDIS_URL ou ADMIN_REDIS_TOKEN absentes.")
+        response = requests.post(
+            self.url,
+            headers={"Authorization": f"Bearer {self.token}"},
+            json=command,
+            timeout=8
+        )
+        response.raise_for_status()
+        payload = response.json()
+        if isinstance(payload, dict) and payload.get("error"):
+            raise RuntimeError(str(payload["error"])[:240])
+        return payload.get("result") if isinstance(payload, dict) else None
+
+    def ping(self):
+        try:
+            self.last_error = ""
+            return self._command(["PING"]) == "PONG"
+        except Exception as exc:
+            self.last_error = f"{type(exc).__name__}: {str(exc)[:200]}"
+            print(f"[ADMIN REDIS] Vérification impossible: {self.last_error}")
+            return False
+
+    def get_events(self):
+        try:
+            raw = self._command(["GET", "admin:audit:events"])
+            if isinstance(raw, str):
+                parsed = json.loads(raw)
+                return parsed if isinstance(parsed, list) else []
+            return raw if isinstance(raw, list) else []
+        except Exception as exc:
+            self.last_error = f"{type(exc).__name__}: {str(exc)[:200]}"
+            print(f"[ADMIN REDIS] Lecture du journal impossible: {self.last_error}")
+            return []
+
+    def append_event(self, action):
+        try:
+            events = self.get_events()
+            from datetime import datetime
+            events.append({"action": str(action)[:80], "at": datetime.now().strftime("%d/%m/%Y %H:%M:%S")})
+            self._command(["SET", "admin:audit:events", json.dumps(events[-100:], ensure_ascii=False)])
+            return True
+        except Exception as exc:
+            self.last_error = f"{type(exc).__name__}: {str(exc)[:200]}"
+            print(f"[ADMIN REDIS] Écriture du journal impossible: {self.last_error}")
+            return False
+
+admin_store = AdminRedisClient()
+
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
 
@@ -918,6 +977,7 @@ def admin_login():
     if request.method == "POST":
         if request.form.get("password") == os.environ.get("ADMIN_PWD"): 
             session["admin_logged_in"] = True
+            admin_store.append_event("Connexion administrateur")
             return redirect(url_for("admin_panel"))
         flash("Mot de passe incorrect")
     return render_template("admin_login.html")
@@ -927,57 +987,180 @@ def admin_panel():
     if not session.get("admin_logged_in"):
         return redirect(url_for("admin_login"))
 
+    tab = request.args.get("tab", "dashboard")
+    allowed_tabs = {"dashboard", "products", "orders", "investments", "customers", "settings"}
+    if tab not in allowed_tabs:
+        tab = "dashboard"
+
     if request.method == "POST":
-        if "titre_poste" in request.form:
-            titre = str(request.form.get("titre_poste", "")).strip()[:120]
-            if titre:
-                kv.last_error = ""
-                postes_list = kv.get("list:postes") or []
-                if kv.last_error:
-                    flash("Impossible de lire les offres : la base de données est indisponible. Aucune modification n'a été enregistrée.")
-                else:
-                    if not isinstance(postes_list, list):
-                        postes_list = []
-                    postes_list.append(titre)
-                    if kv.set("list:postes", postes_list):
-                        flash("Offre publiée avec succès.")
-                    else:
-                        flash("Échec de l'enregistrement : la base de données est indisponible. L'offre n'a pas été publiée.")
-
-        elif "delete_poste_id" in request.form:
+        action = request.form.get("action", "")
+        if action in {"save_product", "delete_product", "update_order", "update_investment"}:
+            admin_store.append_event("Action : " + action)
+        if action == "save_product":
+            kv.last_error = ""
+            products = kv.get("dict:produits") or {}
+            if kv.last_error:
+                flash("Upstash est indisponible. Aucun article n'a été modifié.")
+                return redirect(url_for("admin_panel", tab="products"))
+            product_id = str(request.form.get("product_id", "")).strip()
+            designation = str(request.form.get("designation", "")).strip()[:160]
+            section = str(request.form.get("section", "")).strip()[:60]
+            image = str(request.form.get("image", "")).strip()[:1000]
             try:
-                idx = int(request.form.get("delete_poste_id"))
-                kv.last_error = ""
-                postes_list = kv.get("list:postes") or []
-                if kv.last_error:
-                    flash("Impossible de lire les offres : la base de données est indisponible.")
-                elif isinstance(postes_list, list) and 0 <= idx < len(postes_list):
-                    postes_list.pop(idx)
-                    if kv.set("list:postes", postes_list):
-                        flash("Offre supprimée.")
-                    else:
-                        flash("Échec de la suppression : la base de données est indisponible.")
+                price = int(float(request.form.get("price", "0")))
             except (TypeError, ValueError):
-                flash("Demande de suppression invalide.")
+                price = 0
+            if not designation or not section or price <= 0:
+                flash("Renseigne un nom, une catégorie et un prix valide.")
+            else:
+                if not isinstance(products, dict):
+                    products = {}
+                if not product_id:
+                    product_id = "SS-" + uuid.uuid4().hex[:10].upper()
+                products[product_id] = {"designation": designation, "prix": price, "section": section, "image": image}
+                flash("Article enregistré." if kv.set("dict:produits", products) else "Impossible d'enregistrer l'article dans Upstash.")
+            return redirect(url_for("admin_panel", tab="products"))
 
-        return redirect(url_for("admin_panel"))
+        if action == "delete_product":
+            product_id = str(request.form.get("product_id", "")).strip()
+            kv.last_error = ""
+            products = kv.get("dict:produits") or {}
+            if kv.last_error:
+                flash("Upstash est indisponible. Aucun article n'a été supprimé.")
+            elif isinstance(products, dict) and product_id in products:
+                products.pop(product_id)
+                flash("Article supprimé." if kv.set("dict:produits", products) else "Suppression impossible dans Upstash.")
+            return redirect(url_for("admin_panel", tab="products"))
+
+        if action == "update_order":
+            order_id = str(request.form.get("order_id", "")).strip()
+            status = str(request.form.get("status", "")).strip()[:50]
+            if status not in ["À confirmer", "Confirmée", "En préparation", "Expédiée", "Livrée", "Annulée"]:
+                flash("Statut de commande invalide.")
+            else:
+                order = kv.get("order:" + order_id)
+                if isinstance(order, dict):
+                    order["status"] = status
+                    flash("Commande mise à jour." if kv.set("order:" + order_id, order) else "Mise à jour impossible.")
+            return redirect(url_for("admin_panel", tab="orders"))
+
+        if action == "update_investment":
+            investment_id = str(request.form.get("investment_id", "")).strip()
+            status = str(request.form.get("status", "")).strip()[:50]
+            if status not in ["Nouveau", "En cours", "Contacté", "Clôturé"]:
+                flash("Statut d'investissement invalide.")
+            else:
+                kv.last_error = ""
+                investments = kv.get("list:investissements") or []
+                changed = False
+                if kv.last_error:
+                    flash("Upstash est indisponible. La demande n'a pas été modifiée.")
+                elif isinstance(investments, list):
+                    for item in investments:
+                        if isinstance(item, dict) and item.get("id") == investment_id:
+                            item["status"] = status
+                            changed = True
+                            break
+                flash("Demande mise à jour." if changed and kv.set("list:investissements", investments) else "Mise à jour impossible.")
+            return redirect(url_for("admin_panel", tab="investments"))
+
+    # Chargement séparé : une panne Upstash doit être visible, jamais transformée en liste vide trompeuse.
+    kv.last_error = ""
+    products = kv.get("dict:produits") or {}
+    products_error = bool(kv.last_error)
+    if not isinstance(products, dict):
+        products = {}
 
     kv.last_error = ""
-    postes_list = kv.get("list:postes") or []
-    storage_error = bool(kv.last_error)
-    if storage_error:
-        flash("La base de données des offres est actuellement indisponible. Les offres ne peuvent pas être chargées ni publiées.")
-    if not isinstance(postes_list, list):
-        postes_list = []
-    postes = [
-        {"id": i, "titre": p.get("titre", "") if isinstance(p, dict) else str(p)}
-        for i, p in enumerate(postes_list)
-    ]
+    order_ids = kv.get("list:orders") or []
+    orders_error = bool(kv.last_error)
+    if not isinstance(order_ids, list):
+        order_ids = []
+    orders = []
+    for order_id in order_ids[:200]:
+        kv.last_error = ""
+        order = kv.get("order:" + str(order_id))
+        if isinstance(order, dict):
+            orders.append(order)
+    orders_error = orders_error or bool(kv.last_error)
 
-    return render_template("admin_panel.html", postes=postes, storage_error=storage_error)
+    kv.last_error = ""
+    investments = kv.get("list:investissements") or []
+    investments_error = bool(kv.last_error)
+    if not isinstance(investments, list):
+        investments = []
+
+    customers_map = {}
+    for order in orders:
+        phone = str(order.get("telephone", "")).strip()
+        if phone:
+            customers_map[phone] = {"nom": order.get("nom", ""), "telephone": phone, "ville": order.get("ville", ""), "pays": order.get("pays", ""), "orders": customers_map.get(phone, {}).get("orders", 0) + 1}
+    customers = list(customers_map.values())
+
+    # Statistiques calculées à partir des commandes déjà enregistrées.
+    from datetime import datetime, date, timedelta
+    today = date.today()
+    revenue_orders = [x for x in orders if x.get("status") != "Annulée"]
+    daily_rows = []
+    for offset in range(6, -1, -1):
+        day = today - timedelta(days=offset)
+        day_orders = [x for x in revenue_orders if str(x.get("created_at", ""))[:10] == day.isoformat()]
+        daily_rows.append({
+            "label": day.strftime("%d/%m"),
+            "count": len(day_orders),
+            "revenue": sum(int(x.get("total", 0) or 0) for x in day_orders)
+        })
+
+    monthly_rows = []
+    for offset in range(5, -1, -1):
+        month_index = today.year * 12 + today.month - 1 - offset
+        year, month_zero = divmod(month_index, 12)
+        month = month_zero + 1
+        month_orders = [x for x in revenue_orders if str(x.get("created_at", ""))[:7] == f"{year:04d}-{month:02d}"]
+        monthly_rows.append({
+            "label": f"{month:02d}/{str(year)[-2:]}",
+            "count": len(month_orders),
+            "revenue": sum(int(x.get("total", 0) or 0) for x in month_orders)
+        })
+
+    product_totals = {}
+    for order in revenue_orders:
+        for item in order.get("items", []) or []:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name") or "Article sans nom")
+            try:
+                quantity = int(item.get("quantity", 0) or 0)
+                amount = int(item.get("subtotal", 0) or 0)
+            except (TypeError, ValueError):
+                continue
+            current = product_totals.setdefault(name, {"name": name, "quantity": 0, "revenue": 0})
+            current["quantity"] += max(0, quantity)
+            current["revenue"] += max(0, amount)
+    top_products = sorted(product_totals.values(), key=lambda x: (x["quantity"], x["revenue"]), reverse=True)[:5]
+
+    stats = {
+        "products": len(products),
+        "orders": len(orders),
+        "pending_orders": sum(1 for x in orders if x.get("status", "À confirmer") == "À confirmer"),
+        "investments": len(investments),
+        "customers": len(customers),
+        "revenue": sum(int(x.get("total", 0) or 0) for x in revenue_orders),
+        "delivered": sum(1 for x in orders if x.get("status") == "Livrée"),
+        "cancelled": sum(1 for x in orders if x.get("status") == "Annulée")
+    }
+    admin_storage_ok = admin_store.ping()
+    admin_events = admin_store.get_events()[-10:] if admin_storage_ok else []
+    admin_events.reverse()
+    return render_template("admin_dashboard.html", tab=tab, stats=stats, products=products,
+        orders=orders, investments=investments, customers=customers,
+        daily_rows=daily_rows, monthly_rows=monthly_rows, top_products=top_products,
+        products_error=products_error, orders_error=orders_error, investments_error=investments_error,
+        admin_storage_ok=admin_storage_ok, admin_events=admin_events)
 
 @app.route("/MEDJOGBE11/logout")
 def admin_logout():
+    admin_store.append_event("Déconnexion administrateur")
     session.pop("admin_logged_in", None)
     return redirect(url_for("admin_login"))
 
