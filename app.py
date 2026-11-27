@@ -569,6 +569,57 @@ admin_store = AdminRedisClient()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
+# --- MESURE ANONYME DE FREQUENTATION (sans toucher aux fonctions commerciales) ---
+@app.after_request
+def inject_anonymous_visitor_tracking(response):
+    if response.mimetype != "text/html" or response.status_code != 200:
+        return response
+    if request.path.startswith("/MEDJOGBE11") or request.path.startswith("/api/"):
+        return response
+    body = response.get_data(as_text=True)
+    marker = body.lower().rfind("</body>")
+    if marker < 0:
+        return response
+    tracking_script = r"""
+<script>
+(function () {
+  try {
+    var endpoint = "https://sahelshop-admin.vercel.app/api/collect";
+    var idKey = "sahelshop_anon_visitor_id";
+    var firstKey = "sahelshop_anon_first_seen";
+    var visitorId = localStorage.getItem(idKey);
+    if (!visitorId) {
+      visitorId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() :
+        "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+          var r = Math.random() * 16 | 0;
+          return (c === "x" ? r : (r & 3 | 8)).toString(16);
+        });
+      localStorage.setItem(idKey, visitorId);
+    }
+    var firstSeen = localStorage.getItem(firstKey);
+    if (!firstSeen) {
+      firstSeen = new Date().toISOString();
+      localStorage.setItem(firstKey, firstSeen);
+    }
+    function send(type) {
+      if (document.visibilityState === "hidden" && type === "heartbeat") return;
+      var payload = JSON.stringify({sessionId: visitorId, firstSeen: firstSeen, path: location.pathname.slice(0, 200), type: type});
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(endpoint, new Blob([payload], {type: "text/plain;charset=UTF-8"}));
+      } else {
+        fetch(endpoint, {method: "POST", mode: "cors", keepalive: true, headers: {"Content-Type": "text/plain;charset=UTF-8"}, body: payload}).catch(function(){});
+      }
+    }
+    send("pageview");
+    window.setInterval(function(){ send("heartbeat"); }, 25000);
+    document.addEventListener("visibilitychange", function(){ if (!document.hidden) send("heartbeat"); });
+  } catch (e) {}
+})();
+</script>
+"""
+    response.set_data(body[:marker] + tracking_script + body[marker:])
+    return response
+
 
 # --- CONFIGURATION CLOUDINARY ---
 cloudinary.config( 
