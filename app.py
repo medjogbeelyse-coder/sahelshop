@@ -812,12 +812,16 @@ def passer_commande():
         }
         order_saved = kv.set(order_key, order)
         if order_saved:
+            kv.last_error = ""
             order_ids = kv.get("list:orders") or []
-            if not isinstance(order_ids, list):
-                order_ids = []
-            if order_id not in order_ids:
-                order_ids.insert(0, order_id)
-                kv.set("list:orders", order_ids)
+            if not kv.last_error:
+                if not isinstance(order_ids, list):
+                    order_ids = []
+                if order_id not in order_ids:
+                    order_ids.insert(0, order_id)
+                    kv.set("list:orders", order_ids)
+            else:
+                print(f"[COMMANDE] Index des commandes indisponible pour {order_id}; commande conservée.")
         if not order_saved:
             print(f"[COMMANDE] Stockage KV indisponible pour {order_id}; tentative de notification Telegram maintenue.")
 
@@ -877,7 +881,10 @@ def api_investissement():
         "status": "Nouveau",
         "created_at": __import__("datetime").datetime.utcnow().isoformat() + "Z"
     }
+    kv.last_error = ""
     demandes = kv.get("list:investissements") or []
+    if kv.last_error:
+        return jsonify({"success": False, "message": "La base de données est indisponible. La demande n'a pas été archivée."}), 503
     if not isinstance(demandes, list):
         demandes = []
     demandes.insert(0, demande)
@@ -885,10 +892,10 @@ def api_investissement():
         return jsonify({"success": False, "message": "La demande n'a pas pu être archivée. Réessayez."}), 503
 
     message = (
-        "📈 *Nouvelle Demande d'Investissement* 📈\\n\\n"
-        f"👤 *Nom :* {demande['nom']}\\n🌍 *Pays :* {demande['pays']}\\n"
-        f"🏙️ *Ville :* {demande['ville']}\\n📞 *Téléphone :* {demande['tel']}\\n"
-        f"💰 *Montant :* {demande['montant']} FCFA\\n"
+        "📈 *Nouvelle Demande d'Investissement* 📈\n\n"
+        f"👤 *Nom :* {demande['nom']}\n🌍 *Pays :* {demande['pays']}\n"
+        f"🏙️ *Ville :* {demande['ville']}\n📞 *Téléphone :* {demande['tel']}\n"
+        f"💰 *Montant :* {demande['montant']} FCFA\n"
     )
     telegram = envoyer_telegram(message, mode="Markdown")
     result = telegram.get_json(silent=True) or {}
@@ -965,6 +972,11 @@ def admin_panel():
     if request.method == "POST":
         action = request.form.get("action", "")
         if action == "save_product":
+            kv.last_error = ""
+            products = kv.get("dict:produits") or {}
+            if kv.last_error:
+                flash("Upstash est indisponible. Aucun article n'a été modifié.")
+                return redirect(url_for("admin_panel", tab="products"))
             product_id = str(request.form.get("product_id", "")).strip()
             designation = str(request.form.get("designation", "")).strip()[:160]
             section = str(request.form.get("section", "")).strip()[:60]
@@ -976,7 +988,6 @@ def admin_panel():
             if not designation or not section or price <= 0:
                 flash("Renseigne un nom, une catégorie et un prix valide.")
             else:
-                products = kv.get("dict:produits") or {}
                 if not isinstance(products, dict):
                     products = {}
                 if not product_id:
@@ -987,8 +998,11 @@ def admin_panel():
 
         if action == "delete_product":
             product_id = str(request.form.get("product_id", "")).strip()
+            kv.last_error = ""
             products = kv.get("dict:produits") or {}
-            if isinstance(products, dict) and product_id in products:
+            if kv.last_error:
+                flash("Upstash est indisponible. Aucun article n'a été supprimé.")
+            elif isinstance(products, dict) and product_id in products:
                 products.pop(product_id)
                 flash("Article supprimé." if kv.set("dict:produits", products) else "Suppression impossible dans Upstash.")
             return redirect(url_for("admin_panel", tab="products"))
@@ -1011,9 +1025,12 @@ def admin_panel():
             if status not in ["Nouveau", "En cours", "Contacté", "Clôturé"]:
                 flash("Statut d'investissement invalide.")
             else:
+                kv.last_error = ""
                 investments = kv.get("list:investissements") or []
                 changed = False
-                if isinstance(investments, list):
+                if kv.last_error:
+                    flash("Upstash est indisponible. La demande n'a pas été modifiée.")
+                elif isinstance(investments, list):
                     for item in investments:
                         if isinstance(item, dict) and item.get("id") == investment_id:
                             item["status"] = status
