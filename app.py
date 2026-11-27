@@ -899,7 +899,7 @@ def api_investissement():
     )
     telegram = envoyer_telegram(message, mode="Markdown")
     result = telegram.get_json(silent=True) or {}
-    return jsonify({"success": bool(result.get("success")), "saved": True, "message": "Demande enregistrée." if result.get("success") else "Demande enregistrée, mais notification Telegram non confirmée."}), 200
+    return jsonify({"success": True, "saved": True, "notification_sent": bool(result.get("success")), "message": "Demande enregistrée." if result.get("success") else "Demande enregistrée. La notification Telegram n'a pas été confirmée."}), 200
 
 @app.route("/soumettre-candidature", methods=["POST"])
 def soumettre_candidature():
